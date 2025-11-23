@@ -1,218 +1,101 @@
-x<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Awesome Website</title>
-    <meta name="description" content="A simple, clean, and modern starter HTML website.">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --gray-100: #f3f4f6;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: var(--gray-800);
-            background-color: #fff;
-        }
-        
-        header {
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-decoration: none;
-        }
-        
-        .nav-links a {
-            margin-left: 2rem;
-            text-decoration: none;
-            color: var(--gray-800);
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-        
-        .hero {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            text-align: center;
-            padding: 120px 20px 80px;
-        }
-        
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .hero p {
-            font-size: 1.25rem;
-            max-width: 700px;
-            margin: 0 auto 2rem;
-            opacity: 0.9;
-        }
-        
-        .btn {
-            display: inline-block;
-            background: white;
-            color: var(--primary-dark);
-            padding: 12px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: transform 0.2s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 4rem 20px;
-        }
-        
-        section {
-            padding: 4rem 0;
-        }
-        
-        h2 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: var(--gray-900);
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        
-        .feature-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow **0** 4px 6px rgba(0,0,0,0.05);
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-        
-        footer {
-            background: var(--gray-900);
-            color: white;
-            text-align: center;
-            padding: 3rem 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .nav-links a {
-                margin-left: 1rem;
-            }
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>access terminal</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: #0055aa;
+    color: #aaddff;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 1px;
+  }
+  .box {
+    background: #000033;
+    padding: 40px;
+    border: 2px solid #00aaff;
+    box-shadow: 0 0 20px #00aaff;
+  }
+  input, button {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.2rem;
+    padding: 8px;
+    margin: 10px 0;
+    background: #001122;
+    color: #aaddff;
+    border: 1px solid #00aaff;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:hover { background: #003366; }
+  pre { margin-top: 20px; color: #88ccff; }
+</style>
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="#" class="logo">MySite</a>
-            <div class="nav-links">
-                <a href="#home">Home</a>
-                <a href="#features">Features</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
-            </div>
-        </nav>
-    </header>
 
-    <section class="hero" id="home">
-        <h1>Welcome to My Awesome Website</h1>
-        <p>A clean, modern, and fully responsive starter template built with pure HTML and CSS.</p>
-        <a href="#features" class="btn">Get Started</a>
-    </section>
+<div class="box">
+<pre>
+  ██████╗  █████╗ ███████╗███████╗██╗    ██╗ ██████╗ ██████╗ ██████╗ 
+  ██╔══██╗██╔══██╗██╔════╝██╔════╝██║    ██║██╔═══██╗██╔══██╗██╔══██╗
+  ██████╔╝███████║███████╗███████╗██║ █╗ ██║██║   ██║██████╔╝██║  ██║
+  ██╔═══╝ ██╔══██║╚════██║╚════██║██║███╗██║██║   ██║██╔══██╗██║  ██║
+  ██║     ██║  ██║███████║███████║╚███╔███╔╝╚██████╔╝██║  ██║██████╔╝
+  ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝ ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═════╝ 
+</pre>
 
-    <div class="container">
-        <section id="about">
-            <h2>About Us</h2>
-            <p style="text-align: center; max-width: 800px; margin: 0 auto; font-size: 1.1rem;">
-                We create beautiful, fast, and responsive websites using modern web standards. 
-                This template is perfect for personal portfolios, startups, or any small business looking for a professional online presence.
-            </p>
-        </section>
+<h2>enter password:</h2>
+<input type="password" id="pass" autofocus>
+<button onclick="check()">submit</button>
 
-        <section id="features">
-            <h2>Features</h2>
-            <div class="features">
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3>Fast & Lightweight</h3>
-                    <p>No heavy frameworks. Pure HTML and CSS for blazing-fast load times.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📱</div>
-                    <h3>Fully Responsive</h3>
-                    <p>Looks great on desktop, tablet, and mobile devices.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎨</div>
-                    <h3>Modern Design</h3>
-                    <p>Clean typography, smooth animations, and beautiful gradients.</p>
-                </div>
-            </div>
-        </section>
-    </div>
+<div id="msg"></div>
+<div id="history"></div>
+</div>
 
-    <footer id="contact">
-        <p>&copy; 2025 My Awesome Website. Made with ❤️ and pure HTML/CSS.</p>
-    </footer>
+<script>
+const CORRECT = "ab-1234";
+
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? JSON.parse(decodeURIComponent(match[2])) : [];
+}
+
+function setCookie(name, value, days = 365) {
+  const d = new Date();
+  d.setTime(d.getTime() + (days*24*60*60*1000));
+  document.cookie = name + "=" + encodeURIComponent(JSON.stringify(value)) + ";expires=" + d.toUTCString() + ";path=/";
+}
+
+let failed = getCookie("failed") || [];
+let correctHistory = getCookie("correctHistory") || [];
+
+if (correctHistory.length) {
+  document.getElementById("history").innerHTML = "<pre>previously accepted:\n" + correctHistory.join("\n") + "</pre>";
+}
+
+function check() {
+  const input = document.getElementById("pass").value.trim();
+  const msg = document.getElementById("msg");
+
+  if (input === CORRECT) {
+    if (!correctHistory.includes(input)) {
+      correctHistory.push(input);
+      setCookie("correctHistory", correctHistory);
+    }
+    location.href = "secret.html";
+  } else {
+    failed.push(input + " @ " + new Date().toISOString().slice(0,19).replace("T"," "));
+    setCookie("failed", failed);
+    msg.innerHTML = "<pre style='color:#ff5555'>PASSWORD DENIED</pre>";
+    msg.innerHTML += "<pre>failed attempts:\n" + failed.join("\n") + "</pre>";
+  }
+}
+</script>
 </body>
 </html>
