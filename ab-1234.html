@@ -2,47 +2,712 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>access granted</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>telestai.info</title>
 <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* ===== ROOT & BODY SETUP ===== */
+  /* Ensures gradient extends to all edges including iPhone safe areas */
+
+  html {
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  }
+
   body {
     margin: 0;
     height: 100vh;
-    background: #001122;
-    color: #88ff88;
-    font-family: 'Courier New', Courier, monospace;
-    padding: 40px;
-    letter-spacing: 1px;
+    height: 100dvh; /* Dynamic viewport height accounts for browser UI */
+    font-family: 'Lucida Console', monospace;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Padding accounts for iPhone safe areas (notch/dynamic island) */
+    padding: max(5vh, env(safe-area-inset-top)) env(safe-area-inset-right) max(5vh, env(safe-area-inset-bottom)) env(safe-area-inset-left);
+    transition: background-color 0.5s ease;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
-  pre { white-space: pre-wrap; }
-  audio { margin: 30px 0; width: 80%; }
+
+  /* Main container - centers content within safe viewport */
+  .container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    max-height: 90vh;
+    max-height: 90dvh; /* Use dynamic viewport for better mobile support */
+  }
+
+  /* Main text container - holds all content sections */
+  .text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 1;
+    width: 92vw;
+    margin-bottom: 15px;
+    padding: 1vw;
+    font-size: clamp(0.6rem, 1.6vw, 0.95rem);
+    line-height: 1.3;
+    letter-spacing: 0.2px;
+    text-align: left;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .text-container.visible {
+    opacity: 1;
+  }
+
+  /* Individual text line styling */
+  .text-line {
+    min-height: 1em;
+    margin-bottom: clamp(0.5rem, 1.2vh, 1rem);
+    line-height: 1.35;
+    text-align: left;
+    white-space: pre-wrap;
+    opacity: 0;
+  }
+
+  /* First line (title) - centered at top */
+  .text-line:first-child {
+    margin-bottom: 0.6rem;
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .text-line:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Text line becomes visible when typing animation starts */
+  .text-line.typing {
+    opacity: 1;
+  }
+
+  .text-line.centered {
+    text-align: center;
+  }
+
+  /* Audio player - centered at bottom */
+  .audio-player {
+    display: block;
+    flex-shrink: 0;
+    width: 85vw;
+    min-width: 280px;
+    position: relative;
+    z-index: 10;
+    outline: none;
+  }
+
+  audio::-webkit-media-controls-panel {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  /* Download button - centered below audio player */
+  .download-btn {
+    position: absolute;
+    top: calc(100% + 20px);
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: clamp(10px, 1.5vw, 18px) clamp(20px, 3vw, 32px);
+    font-family: 'Lucida Console', monospace;
+    font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+    letter-spacing: 1px;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #ffffff;
+    border-radius: 8px;
+    opacity: 0;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    z-index: 100;
+  }
+
+  .download-btn.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .download-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-50%) scale(1.05);
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1em;
+    background-color: #ffffff;
+    margin-left: 2px;
+    animation: blink 0.7s infinite;
+  }
+
+  @keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+  }
+
+  .star.visible {
+    animation: twinkle 3s infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* ===== MUSIC & PICNIC SECTION ===== */
+  /* Two-column layout with headers */
+
+  .music-picnic-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, 1.2vh, 1rem);
+  }
+
+  /* Top header: "MUSIC & A PICNIC" */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    opacity: 0;
+    animation: revealLine 0.2s forwards;
+    animation-delay: 0s;
+  }
+
+  .section-header span:first-child {
+    flex: 1;
+    text-align: center;
+    padding-right: 1rem;
+  }
+
+  /* Centered ampersand */
+  .section-header span:nth-child(2) {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+
+  .section-header span:last-child {
+    flex: 1;
+    text-align: center;
+    padding-left: 1rem;
+  }
+
+  /* Subheader: "MUSIC (IS PROVIDED)" and "PICNIC (IS PROVIDED BY YOU)" */
+  .section-subheader {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: clamp(0.2rem, 0.5vh, 0.4rem);
+    opacity: 0;
+    animation: revealLine 0.2s forwards;
+    animation-delay: 0.15s;
+  }
+
+  /* Container for the two columns */
+  .columns-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 2rem;
+  }
+
+  /* Column styling - fixed line height for consistent spacing */
+  .left-column,
+  .right-column {
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  /* Music column - left aligned */
+  .left-column {
+    text-align: left;
+  }
+
+  /* Picnic column - right aligned */
+  .right-column {
+    text-align: right;
+  }
+
+  /* Individual lines within columns - staggered reveal animation */
+  .left-column > *,
+  .right-column > * {
+    opacity: 0;
+    animation: revealLine 0.15s forwards;
+    margin-bottom: 0.1em;
+  }
+
+  /* Staggered animation delays for each line in columns */
+  .left-column > *:nth-child(1),
+  .right-column > *:nth-child(1) { animation-delay: 0.3s; }
+
+  .left-column > *:nth-child(2),
+  .right-column > *:nth-child(2) { animation-delay: 0.4s; }
+
+  .left-column > *:nth-child(3),
+  .right-column > *:nth-child(3) { animation-delay: 0.5s; }
+
+  .left-column > *:nth-child(4),
+  .right-column > *:nth-child(4) { animation-delay: 0.6s; }
+
+  .left-column > *:nth-child(5),
+  .right-column > *:nth-child(5) { animation-delay: 0.7s; }
+
+  .left-column > *:nth-child(6),
+  .right-column > *:nth-child(6) { animation-delay: 0.8s; }
+
+  .left-column > *:nth-child(7),
+  .right-column > *:nth-child(7) { animation-delay: 0.9s; }
+
+  @keyframes revealLine {
+    to { opacity: 1; }
+  }
 </style>
 </head>
 <body>
 
-<pre>
-ACCESS GRANTED
-──────────────────────────────
-you are now inside the system.
+<div class="container">
+  <div class="text-container" id="textContainer">
+    <!-- Text lines will be inserted here -->
+  </div>
 
-this is the secret plaintext page.
-only people who know "ab-1234" can be here.
+  <audio id="audioPlayer" class="audio-player" controls>
+    <source src="ab1234_teaser.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 
-here is your reward:
+  <button class="download-btn" id="downloadBtn">download flyer</button>
+</div>
 
-</pre>
+<script>
+// ========================================
+// CONFIGURATION
+// ========================================
 
-<audio controls autoplay loop>
-  <source src="secret-sound.mp3" type="audio/mpeg">
-  your browser does not support audio.
-</audio>
+// Text sections with timing (in seconds) for reveal animation
+// Each section displays when audio reaches the specified time
+const textSections = [
+  // Section 0: Title and invite header (centered)
+  {
+    time: 0.5,
+    text: "┣ - - - Q3-PICNIC-SUNSET-SET - - - ┫\n\n--OPEN-INVITE--"
+  },
 
-<pre>
-you can put any secret text here.
-or more audio files, images, etc.
+  // Section 1: Date information
+  {
+    time: 4.0,
+    text: "ON\nTHURSDAY\nAUGUST TWENTY-ONE\nTWENTY-FIVE"
+  },
 
-press back in your browser or close the tab to log out.
-</pre>
+  // Section 2: Time information
+  {
+    time: 8.0,
+    text: "@\nSIX THIRTY PM\nUNTIL\nNINE PM (ISH)"
+  },
 
-<!-- replace secret-sound.mp3 with any mp3 file in the same folder -->
+  // Section 3: Location information
+  {
+    time: 12.0,
+    text: "@\nBLUE JACKET PARK (LAKE BALDWIN)\n28.57264°N, 81.33414°W"
+  },
+
+  // Section 4: Invitation intro
+  {
+    time: 16.0,
+    text: "YOU ARE INVITED TO CELEBRATE\nFOR NO PARTICULAR REASON\nJUST BECAUSE WE CAN\nWITH"
+  },
+
+  // Section 5: Music & Picnic columns (custom HTML layout)
+  {
+    time: 20.0,
+    text: "",
+    isCustom: true
+  },
+
+  // Section 6: Rules section
+  {
+    time: 26.0,
+    text: "PLEASE ABIDE BY THE\nRULES:\n1. COME FOR THE MUSIC. COME FOR THE COMPANY.\n2. BE OPEN TO UNFAMILIAR SOUNDS.\n3. FACE ONE ANOTHER, NOT THE DJ.\n4. BE PRESENT, NOT ONLINE."
+  },
+
+  // Section 7: ASCII art signature
+  {
+    time: 32.0,
+    text: ".:####:\n.:..:###**###:\n:##**°##*     *#!\n°#!    *°see you soon <3\n°#:..:                ##°\n**°##..##*         -snowe\n##*°"
+  }
+];
+
+// Sunset color progression for background animation
+// Colors transition based on audio progress (0-100%)
+const sunsetColors = [
+  { percent: 0, color: [100, 149, 237] },    // cornflower blue
+  { percent: 20, color: [135, 206, 235] },   // light sky blue
+  { percent: 35, color: [255, 183, 77] },    // sunset orange
+  { percent: 55, color: [255, 107, 107] },   // sunset pink/red
+  { percent: 75, color: [50, 50, 120] },     // twilight purple-blue
+  { percent: 100, color: [10, 10, 40] }      // deep midnight blue
+];
+
+// Path to downloadable flyer image
+const flyerImagePath = "flyer.png";
+
+// ========================================
+// END CONFIGURATION
+// ========================================
+
+// ========================================
+// DOM ELEMENTS & STATE
+// ========================================
+
+const audio = document.getElementById('audioPlayer');
+const textContainer = document.getElementById('textContainer');
+const downloadBtn = document.getElementById('downloadBtn');
+
+// State management
+let hasStartedPlaying = false;  // Track if audio has started for first time
+let textElements = [];           // Array of DOM elements for text sections
+let currentTextIndex = 0;        // Index of current section being revealed
+let isTyping = false;            // Flag to prevent overlapping typing animations
+let typingTimeout = null;        // Timeout reference for typing animation
+let stars = [];                  // Array of star DOM elements for night sky
+
+// ========================================
+// INITIALIZATION FUNCTIONS
+// ========================================
+
+// Create all text elements and insert into DOM
+function initializeTextElements() {
+  textContainer.innerHTML = '';
+
+  textSections.forEach((section, index) => {
+    const div = document.createElement('div');
+    div.className = 'text-line';
+    div.dataset.index = index;
+
+    // Section 5: Custom HTML layout for MUSIC & PICNIC columns
+    if (section.isCustom && index === 5) {
+      div.innerHTML = `
+        <div class="music-picnic-section">
+          <!-- Header: "MUSIC & A PICNIC" -->
+          <div class="section-header">
+            <span>MUSIC</span>
+            <span>&</span>
+            <span>A PICNIC</span>
+          </div>
+
+          <!-- Subheader: descriptions -->
+          <div class="section-subheader">
+            <span>MUSIC (IS PROVIDED)</span>
+            <span>PICNIC (IS PROVIDED BY YOU)</span>
+          </div>
+
+          <!-- Two columns: Music genres (left) and What to bring (right) -->
+          <div class="columns-container">
+            <div class="left-column">
+              <div>e.g.</div>
+              <div>french touch</div>
+              <div>jazz house</div>
+              <div>U.K Garage</div>
+              <div>prog. house</div>
+              <div>disco</div>
+              <div>trance 2.0</div>
+            </div>
+            <div class="right-column">
+              <div>bring</div>
+              <div>blanket</div>
+              <div>food/charcuterie</div>
+              <div>wine</div>
+              <div>art supply</div>
+              <div>board game/frisbee/book</div>
+              <div>good vibrations</div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Standard text sections: store text in data attribute
+      div.dataset.text = section.text;
+    }
+
+    textContainer.appendChild(div);
+    textElements.push(div);
+  });
+}
+
+// Create star elements for night sky effect
+function createStars() {
+  const starCount = 50;
+  for (let i = 0; i < starCount; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = `${Math.random() * 100}%`;
+    star.style.top = `${Math.random() * 100}%`;
+    star.style.animationDelay = `${Math.random() * 3}s`;
+    document.body.appendChild(star);
+    stars.push(star);
+  }
+}
+
+// ========================================
+// ANIMATION FUNCTIONS
+// ========================================
+
+// Typewriter effect for text reveal
+// Returns a promise that resolves when typing is complete
+function typeText(element, text, speed = 50) {
+  return new Promise((resolve) => {
+    element.classList.add('typing');
+    let index = 0;
+
+    function type() {
+      if (index < text.length) {
+        // Update text content
+        element.textContent = text.substring(0, index + 1);
+
+        // Add blinking cursor (except on last character)
+        if (index < text.length - 1) {
+          const cursor = document.createElement('span');
+          cursor.className = 'cursor';
+          element.appendChild(cursor);
+        }
+
+        index++;
+        const currentChar = text.charAt(index - 1);
+        const prevChar = index > 1 ? text.charAt(index - 2) : '';
+        const nextChar = index < text.length ? text.charAt(index) : '';
+
+        // Adjust typing speed for special characters
+        let delay = speed;
+        if (currentChar === '\n') {
+          // No delay for newlines
+          delay = 0;
+        } else if (currentChar === ' ') {
+          // No delay for leading/trailing spaces
+          const isLeadingSpace = prevChar === '' || prevChar === '\n';
+          const isTrailingSpace = nextChar === '\n' || nextChar === '';
+          delay = (isLeadingSpace || isTrailingSpace) ? 0 : speed;
+        }
+
+        typingTimeout = setTimeout(type, delay);
+      } else {
+        // Remove cursor when typing is complete
+        const cursor = element.querySelector('.cursor');
+        if (cursor) cursor.remove();
+        resolve();
+      }
+    }
+
+    type();
+  });
+}
+
+// ========================================
+// BACKGROUND & COLOR FUNCTIONS
+// ========================================
+
+// Interpolate between two RGB colors
+function interpolateColor(color1, color2, factor) {
+  const result = color1.slice();
+  for (let i = 0; i < 3; i++) {
+    result[i] = Math.round(result[i] + factor * (color2[i] - result[i]));
+  }
+  return result;
+}
+
+// Generate CSS gradient from sunset color stops
+function getBackgroundGradient(progress) {
+  const gradientStops = sunsetColors.map(stop => {
+    const color = stop.color;
+    return `rgb(${color[0]}, ${color[1]}, ${color[2]}) ${stop.percent}%`;
+  });
+
+  return `linear-gradient(to bottom, ${gradientStops.join(', ')})`;
+}
+
+// Update background color based on audio progress
+// Also controls star visibility (appears after 70% progress)
+function updateBackground() {
+  if (!audio.duration) return;
+
+  const progress = (audio.currentTime / audio.duration) * 100;
+  const gradientHeight = 300;
+  const backgroundPosition = progress * (gradientHeight - 100) / 100;
+
+  // Animate gradient position to simulate sunset progression
+  document.body.style.background = getBackgroundGradient(progress);
+  document.body.style.backgroundSize = '100% 300vh';
+  document.body.style.backgroundPosition = `0 -${backgroundPosition}vh`;
+
+  // Show stars during night phase (after 70% progress)
+  if (progress > 70) {
+    stars.forEach(star => star.classList.add('visible'));
+  } else {
+    stars.forEach(star => star.classList.remove('visible'));
+  }
+}
+
+// ========================================
+// TEXT REVEAL & TIMING FUNCTIONS
+// ========================================
+
+// Check if it's time to reveal the next text section
+// Called on every audio timeupdate event
+function checkTextReveal() {
+  if (isTyping || currentTextIndex >= textSections.length) return;
+
+  const nextSection = textSections[currentTextIndex];
+
+  if (audio.currentTime >= nextSection.time) {
+    isTyping = true;
+    const element = textElements[currentTextIndex];
+
+    if (nextSection.isCustom) {
+      // Custom sections (like MUSIC & PICNIC) have their own CSS animations
+      element.classList.add('typing');
+      isTyping = false;
+      currentTextIndex++;
+    } else {
+      // Standard text sections use typewriter effect
+      const averageSpeed = audio.duration < 30 ? 40 : 60;
+      typeText(element, nextSection.text, averageSpeed).then(() => {
+        isTyping = false;
+        currentTextIndex++;
+      });
+    }
+  }
+}
+
+// Show download button near the end of audio
+function checkDownloadButton() {
+  if (audio.currentTime >= audio.duration - 0.5 && audio.duration > 0) {
+    downloadBtn.classList.add('visible');
+  }
+}
+
+// ========================================
+// EVENT LISTENERS
+// ========================================
+
+// Initialize on first play
+audio.addEventListener('play', () => {
+  if (!hasStartedPlaying) {
+    hasStartedPlaying = true;
+    textContainer.classList.add('visible');
+    initializeTextElements();
+    createStars();
+  }
+});
+
+// Update background and text on every frame
+audio.addEventListener('timeupdate', () => {
+  updateBackground();
+  checkTextReveal();
+  checkDownloadButton();
+});
+
+// Show download button when audio ends
+audio.addEventListener('ended', () => {
+  downloadBtn.classList.add('visible');
+});
+
+// Handle seeking: update text visibility based on new time position
+audio.addEventListener('seeking', () => {
+  // Cancel any ongoing typing animation
+  if (typingTimeout) {
+    clearTimeout(typingTimeout);
+    typingTimeout = null;
+  }
+  isTyping = false;
+
+  // Determine which sections should be visible at current time
+  currentTextIndex = 0;
+  for (let i = textSections.length - 1; i >= 0; i--) {
+    if (audio.currentTime >= textSections[i].time) {
+      currentTextIndex = i + 1;
+      break;
+    }
+  }
+
+  // Update visibility of all text elements
+  textElements.forEach((element, index) => {
+    if (index < currentTextIndex) {
+      // Section should be visible
+      element.classList.add('typing');
+      if (!textSections[index].isCustom) {
+        element.textContent = textSections[index].text;
+      }
+    } else {
+      // Section should be hidden
+      element.classList.remove('typing');
+      if (!textSections[index].isCustom) {
+        element.textContent = '';
+      }
+    }
+  });
+
+  // Hide download button if seeking before end
+  if (audio.currentTime < audio.duration - 0.5) {
+    downloadBtn.classList.remove('visible');
+  }
+});
+
+// Download flyer when button is clicked
+downloadBtn.addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.href = flyerImagePath;
+  link.download = 'flyer.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
+
+// ========================================
+// INITIALIZE
+// ========================================
+
+// Set initial background color (daytime blue)
+document.body.style.background = getBackgroundGradient(0);
+document.body.style.backgroundSize = '100% 300vh';
+document.body.style.backgroundPosition = '0 0';
+</script>
+
 </body>
 </html>
