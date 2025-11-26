@@ -2,56 +2,95 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>access terminal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>telestai.info</title>
 <style>
   body {
     margin: 0;
     height: 100vh;
-    background: #0055aa;
-    color: #aaddff;
-    font-family: 'Courier New', Courier, monospace;
+    background: #012a54;
+    color: #ffffff;
+    font-family: 'Lucida Console', monospace;
+    font-size: 0.95rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     letter-spacing: 1px;
+    overflow: hidden;
+    touch-action: none;
+    position: fixed;
+    width: 100vw;
   }
-  .box {
-    background: #000033;
-    padding: 40px;
-    border: 2px solid #00aaff;
-    box-shadow: 0 0 20px #00aaff;
+  h2 {
+    font-size: 1.15rem;
+    margin-bottom: 10px;
+    text-align: left;
+    width: 100%;
+    max-width: 270px;
+  }
+  @keyframes dots {
+    0%, 33% { content: '.'; }
+    34%, 66% { content: '..'; }
+    67%, 100% { content: '...'; }
+  }
+  .animated-text::after {
+    content: '.';
+    animation: dots 3s infinite;
   }
   input, button {
     font-family: 'Courier New', Courier, monospace;
-    font-size: 1.2rem;
-    padding: 8px;
+    font-size: 1.05rem;
+    padding: 6px;
     margin: 10px 0;
-    background: #001122;
-    color: #aaddff;
+    background: #000000;
+    color: #ffffff;
     border: 1px solid #00aaff;
+    border-radius: 8px;
+  }
+  .code-input {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 20px 0;
+  }
+  .code-box {
+    width: 32px;
+    height: 36px;
+    text-align: center;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    padding: 0;
+  }
+  .separator {
+    font-size: 1.2rem;
+    margin: 0 5px;
   }
   button {
     cursor: pointer;
   }
   button:hover { background: #003366; }
-  pre { margin-top: 20px; color: #88ccff; }
+  pre { margin-top: 20px; color: #88ccff; font-size: 0.8rem; }
+  .box {
+    text-align: center;
+  }
 </style>
 </head>
 <body>
 
 <div class="box">
-<pre>
-  ██████╗  █████╗ ███████╗███████╗██╗    ██╗ ██████╗ ██████╗ ██████╗ 
-  ██╔══██╗██╔══██╗██╔════╝██╔════╝██║    ██║██╔═══██╗██╔══██╗██╔══██╗
-  ██████╔╝███████║███████╗███████╗██║ █╗ ██║██║   ██║██████╔╝██║  ██║
-  ██╔═══╝ ██╔══██║╚════██║╚════██║██║███╗██║██║   ██║██╔══██╗██║  ██║
-  ██║     ██║  ██║███████║███████║╚███╔███╔╝╚██████╔╝██║  ██║██████╔╝
-  ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝ ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═════╝ 
-</pre>
 
-<h2>enter password:</h2>
-<input type="password" id="pass" autofocus>
+<h2 class="animated-text">enter access code</h2>
+<div class="code-input">
+  <input type="text" class="code-box" id="c1" maxlength="1" autofocus>
+  <input type="text" class="code-box" id="c2" maxlength="1">
+  <span class="separator">-</span>
+  <input type="text" class="code-box" id="c3" maxlength="1" inputmode="numeric" pattern="[0-9]">
+  <input type="text" class="code-box" id="c4" maxlength="1" inputmode="numeric" pattern="[0-9]">
+  <input type="text" class="code-box" id="c5" maxlength="1" inputmode="numeric" pattern="[0-9]">
+  <input type="text" class="code-box" id="c6" maxlength="1" inputmode="numeric" pattern="[0-9]">
+</div>
 <button onclick="check()">submit</button>
 
 <div id="msg"></div>
@@ -72,28 +111,46 @@ function setCookie(name, value, days = 365) {
   document.cookie = name + "=" + encodeURIComponent(JSON.stringify(value)) + ";expires=" + d.toUTCString() + ";path=/";
 }
 
-let failed = getCookie("failed") || [];
 let correctHistory = getCookie("correctHistory") || [];
 
 if (correctHistory.length) {
-  document.getElementById("history").innerHTML = "<pre>previously accepted:\n" + correctHistory.join("\n") + "</pre>";
+  document.getElementById("history").innerHTML = "<pre>used access codes:\n" + correctHistory.join("\n") + "</pre>";
 }
 
+// Auto-advance to next box on input
+const boxes = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'];
+boxes.forEach((id, index) => {
+  const box = document.getElementById(id);
+  box.addEventListener('input', (e) => {
+    if (e.target.value && index < boxes.length - 1) {
+      document.getElementById(boxes[index + 1]).focus();
+    }
+  });
+  box.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+      document.getElementById(boxes[index - 1]).focus();
+    }
+  });
+});
+
 function check() {
-  const input = document.getElementById("pass").value.trim();
+  const input = document.getElementById("c1").value +
+                document.getElementById("c2").value +
+                "-" +
+                document.getElementById("c3").value +
+                document.getElementById("c4").value +
+                document.getElementById("c5").value +
+                document.getElementById("c6").value;
   const msg = document.getElementById("msg");
 
-  if (input === CORRECT) {
-    if (!correctHistory.includes(input)) {
-      correctHistory.push(input);
+  if (input.toLowerCase() === CORRECT) {
+    if (!correctHistory.includes(input.toLowerCase())) {
+      correctHistory.push(input.toLowerCase());
       setCookie("correctHistory", correctHistory);
     }
     location.href = "ab-1234.html";
   } else {
-    failed.push(input + " @ " + new Date().toISOString().slice(0,19).replace("T"," "));
-    setCookie("failed", failed);
     msg.innerHTML = "<pre style='color:#ff5555'>PASSWORD DENIED</pre>";
-    msg.innerHTML += "<pre>failed attempts:\n" + failed.join("\n") + "</pre>";
   }
 }
 </script>
