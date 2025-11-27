@@ -8,15 +8,15 @@
   body {
     margin: 0;
     height: 100vh;
-    background: #012a54;
+    background: #00152b;
     color: #ffffff;
     font-family: 'Lucida Console', monospace;
-    font-size: 0.95rem;
+    font-size: clamp(0.45rem, 1vh, 0.85rem);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    letter-spacing: 1px;
+    letter-spacing: 0.3px;
     overflow: hidden;
     touch-action: none;
     position: fixed;
@@ -39,13 +39,13 @@
     animation: dots 3s infinite;
   }
   input, button {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Lucida Console', monospace;
     font-size: 1.05rem;
     padding: 6px;
     margin: 10px 0;
     background: #000000;
     color: #ffffff;
-    border: 1px solid #00aaff;
+    border: 1px solid #ffffff;
     border-radius: 8px;
   }
   .code-input {
@@ -74,6 +74,13 @@
   pre { margin-top: 20px; color: #88ccff; font-size: 0.8rem; }
   .box {
     text-align: center;
+  }
+  .fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+  }
+  body.fade-background {
+    transition: background-color 1.5s ease-in-out;
   }
 </style>
 </head>
@@ -148,7 +155,21 @@ function check() {
       correctHistory.push(input.toLowerCase());
       setCookie("correctHistory", correctHistory);
     }
-    location.href = "ab-1234.html";
+
+    // Hide the main content box
+    const box = document.querySelector('.box');
+    box.classList.add('fade-out');
+
+    // Add background transition class and start fade
+    document.body.classList.add('fade-background');
+    setTimeout(() => {
+      document.body.style.backgroundColor = 'rgb(135,206,235)';
+    }, 500);
+
+    // Redirect after animations complete
+    setTimeout(() => {
+      location.href = "ab-1234.html";
+    }, 2000);
   } else {
     msg.innerHTML = "<pre style='color:#ff5555'>PASSWORD DENIED</pre>";
   }

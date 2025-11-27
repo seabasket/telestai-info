@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>telestai.info</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Lucida Console', monospace;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    background-color: rgb(135,206,235);
+    transition: background 0.1s ease-out;
+  }
+
+  .text-container {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 15%;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto auto auto auto auto auto auto;
+  grid-template-areas:
+    "header header header"
+    "d  . ."
+    "t . l"
+    "i . ."
+    "music and picnic"
+    "md img pd"
+    "rules rules rules"
+    ". signoff signoff";
+  gap: clamp(3px, 0.8vh, 10px);
+  align-items: start;
+  text-align: center;
+  font-size: clamp(0.45rem, 1vh, 0.85rem);
+  letter-spacing: 0.3px;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  opacity: 1;
+  overflow: hidden;
+}
+
+.text-container .typewriter {
+  opacity: 0;
+}
+
+  .audio-player {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    opacity: 1;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+
+  .audio-player.playing {
+    top: 88%;
+    transform: translate(-50%, -50%);
+  }
+
+  audio {
+    outline: none;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  audio::-webkit-media-controls-panel {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  pre {
+    margin: 0;
+    padding: 0;
+  }
+
+  #stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease-in;
+  }
+
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  .home-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-family: 'Lucida Console', monospace;
+    font-size: clamp(0.45rem, 1vh, 0.85rem);
+    letter-spacing: 0.3px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .home-button:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="text-container">
+  <div class="typewriter" style="grid-area: header; justify-self: center; text-align: center;"><pre style="text-align: center;">|- - - - - WINTER-PICNIC-SUNSET-SET- - - - -|
+
+--OPEN-INVITE--</pre></div>
+
+  <div class="typewriter" style="grid-area: d; text-align: left;"><pre>
+ON
+SUNDAY
+DECEMBER FOURTEENTH
+         TWENTY TWENTY-FIVE
+
+  </pre></div>
+
+  <div class="typewriter" style="grid-area: t; text-align: left;"><pre>
+@
+FOUR PM
+UNTIL
+SEVEN FOURTY-FIVE PM (ISH)
+  </pre></div>
+
+  <div class="typewriter" style="grid-area: l; text-align: left;"><pre>
+@
+LAKE EOLA PARK
+28.54497° N, 81.37117° W
+  (EAST SIDE, BY THE PAGODA)
+    [DAY OF UPDATES: 
+      @telestai.info ON IG]
+  </pre></div>
+
+  <div class="typewriter" style="grid-area: i; text-align: left;"><pre>
+
+YOU ARE INVITED TO CELEBRATE
+  FOR NO PARTICULAR REASON
+    JUST BECAUSE WE CAN
+
+
+WITH
+  </pre></div>
+
+  <div class="typewriter" style="grid-area: music; text-align: center;">MUSIC</div>
+
+  <div class="typewriter" style="grid-area: and; text-align: center;">&</div>
+
+  <div class="typewriter" style="grid-area: picnic; text-align: center;">A PICNIC</div>
+
+  <div style="grid-area: img; display: flex; align-items: center; justify-content: center;">
+    <img id="circleImage" src="ab-1234.jpeg" alt="" style="width: clamp(60px, 12vw, 120px); height: clamp(60px, 12vw, 120px); border-radius: 50%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease-in;">
+  </div>
+
+  <div class="typewriter" style="grid-area: md; text-align: left;"><pre>
+MUSIC (PROVIDED)
+e.g.
+
+french touch
+jazz house
+U.K Garage
+prog. house
+disco
+trance 2.0
+w/ a sprinkle of bass
+  </pre></div>
+
+  <div class="typewriter" style="grid-area: pd; text-align: right;"><pre>
+PICNIC (PROVIDED BY YOU)
+bring your own:
+
+blanket (picnic)
+blanket again (winter picnic)
+food/charcuterie
+drink/wine
+art stuff/kandi
+board game/frisbee/book
+holiday cheer
+  </pre></div>
+
+  <div class="typewriter" style="grid-area: rules; text-align: left;"><pre>
+PLEASE ABIDE BY THE
+RULES:
+1. COME FOR THE MUSIC.
+2. BE OPEN TO UNFAMILIAR SOUNDS.
+3. FACE ONE ANOTHER, NOT THE DJ.
+4. BE PRESENT, NOT ONLINE.
+  </pre></div>
+
+  <div class="typewriter" style="grid-area: signoff; text-align: left;"><pre>
+⠀⠀⠀⠀⠀⠀⠀⠀⣠⣶⣶⣶⣦⠀⠀
+⠀⠀⣠⣤⣤⣄⣀⣾⣿⠟⠛⠻⢿⣷⠀
+⢰⣿⡿⠛⠙⠻⣿⣿⠁⠀⠀⠀⣶⢿⡇
+⢿⣿⣇   ⠈⠏see you soon <3
+⠻⣿⣷⣦⣤⣀⠀⠀⠀⠀⣾⡿⠃⠀
+⠀⠀⠀⠀⠉⠉⠻⣿⣄⣴⣿⠟⠀⠀⠀    -srowe/telestai
+⠀⠀⠀⠀⠀⠀⠀⣿⡿⠟⠁⠀⠀⠀⠀
+</pre></div>
+</div>
+
+<div class="audio-player">
+  <audio controls>
+    <source src="251214-wpss.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+</div>
+
+<a href="index.html" class="home-button">HOME</a>
+
+<script>
+// Sunset color progression (0-100%)
+const sunsetColors = [
+  { percent: 0, color: [10, 10, 40] },       // deep midnight blue
+  { percent: 25, color: [50, 50, 120] },      // twilight purple-blue
+  { percent: 50, color: [255, 107, 107] },   // sunset pink/red
+  { percent: 65, color: [255, 183, 77] },    // sunset orange
+  { percent: 95, color: [100, 149, 237] },   // cornflower blue
+  { percent: 100, color: [135, 206, 235] }   // light sky blue
+  
+];
+
+// Generate gradient based on animation progress (0-100)
+function getRadialGradient(progress) {
+  // At 0%, entire screen is cornflower blue
+  // At 50%, mostly orange and pink/red
+  // At 100%, entire screen is deep midnight blue
+  // Colors sweep from top to bottom in an arc shape
+
+  const gradientStops = sunsetColors.map((stop, index) => {
+    const color = stop.color;
+
+    // Shift gradient from bottom (-100%) to top (200%) as progress goes 0 to 100
+    // At 0%: gradient below viewport, screen shows first color (cornflower blue)
+    // At 100%: gradient above viewport, screen shows last color (midnight blue)
+    const shiftAmount = -100 + (progress / 100) * 200;
+    const adjustedPercent = stop.percent + shiftAmount;
+
+    return `rgb(${color[0]}, ${color[1]}, ${color[2]}) ${adjustedPercent}%`;
+  });
+
+  // Create a radial gradient with ellipse at top center, creating a downward arc
+  return `radial-gradient(ellipse 150% 100% at center bottom, ${gradientStops.join(', ')})`;
+}
+
+// Audio player references
+const audioPlayer = document.querySelector('.audio-player');
+const audioElement = document.querySelector('audio');
+const container = document.querySelector('.text-container');
+const starsContainer = document.getElementById('stars');
+let hasBeenPlayed = false;
+let animationFrameId = null;
+
+// Generate twinkling stars
+function createStars() {
+  const starCount = 50;
+  for (let i = 0; i < starCount; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = `${Math.random() * 100}%`;
+    star.style.top = `${Math.random() * 100}%`;
+    star.style.animationDelay = `${Math.random() * 3}s`;
+    starsContainer.appendChild(star);
+  }
+}
+
+createStars();
+
+// Update gradient and typewriter based on audio progress
+function updateGradient() {
+  if (audioElement.duration) {
+    const progress = (audioElement.currentTime / audioElement.duration) * 100;
+    document.body.style.background = getRadialGradient(progress);
+
+    // Show stars as animation finishes (70% onwards)
+    if (progress >= 50) {
+      const starOpacity = progress - 25; // starts appearing at 50%, fully visible at 100%
+      starsContainer.style.opacity = starOpacity;
+    } else {
+      starsContainer.style.opacity = 0;
+    }
+
+    // Update typewriter progress
+    updateTypewriter();
+  }
+
+  // Continue animation loop if audio is playing
+  if (!audioElement.paused) {
+    animationFrameId = requestAnimationFrame(updateGradient);
+  }
+}
+
+// Audio player position animation - lock in place after first play
+audioElement.addEventListener('play', () => {
+  if (!hasBeenPlayed) {
+    audioPlayer.classList.add('playing');
+    hasBeenPlayed = true;
+  }
+  // Start smooth animation loop
+  if (animationFrameId === null) {
+    updateGradient();
+  }
+});
+
+// Stop animation loop when paused
+audioElement.addEventListener('pause', () => {
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
+});
+
+// Update gradient and typewriter when user seeks
+audioElement.addEventListener('seeked', () => {
+  updateGradient();
+  updateTypewriter();
+});
+
+// Initialize gradient on load
+audioElement.addEventListener('loadedmetadata', updateGradient);
+
+// Typewriter effect synced to audio position
+let typewriterPrepared = false;
+let typewriterData = [];
+let totalChars = 0;
+let imageRevealChar = 0;
+
+function prepareTypewriter() {
+  if (typewriterPrepared) return;
+  typewriterPrepared = true;
+
+  const getElement = (area) => document.querySelector(`[style*="grid-area: ${area}"]`);
+
+  const orderedElements = [
+    [getElement('header')],
+    [getElement('d')],
+    [getElement('t')],
+    [getElement('l')],
+    [getElement('i')],
+    [getElement('music')],
+    [getElement('and')],
+    [getElement('picnic')],
+    [getElement('md'), getElement('pd')], // Type both music and picnic columns simultaneously
+    [getElement('rules')],
+    [getElement('signoff')]
+  ];
+
+  // Store original text and prepare elements
+  orderedElements.forEach((group, groupIndex) => {
+    const groupStartChar = totalChars;
+    let maxGroupLength = 0;
+
+    // Capture when md/pd group starts (index 8)
+    if (groupIndex === 8) {
+      imageRevealChar = groupStartChar;
+    }
+
+    // First pass: calculate max length in group
+    group.forEach(el => {
+      if (el) {
+        const preTag = el.querySelector('pre');
+        const textContainer = preTag || el;
+        const text = textContainer.textContent;
+        maxGroupLength = Math.max(maxGroupLength, text.length);
+      }
+    });
+
+    // Second pass: store data with same start char for all in group
+    group.forEach(el => {
+      if (el) {
+        const preTag = el.querySelector('pre');
+        const textContainer = preTag || el;
+        const text = textContainer.textContent;
+
+        // Measure and preserve dimensions before clearing
+        const height = el.offsetHeight;
+
+        typewriterData.push({
+          element: el,
+          textContainer: textContainer,
+          text: text,
+          startChar: groupStartChar,
+          endChar: groupStartChar + text.length
+        });
+
+        // Set min-height to prevent layout shift
+        if (height > 0) {
+          el.style.minHeight = `${height}px`;
+        }
+
+        textContainer.textContent = '';
+        el.style.opacity = '1';
+      }
+    });
+
+    // Increment totalChars by the longest element in the group
+    totalChars += maxGroupLength;
+  });
+}
+
+function updateTypewriter() {
+  if (!typewriterPrepared || !audioElement.duration) return;
+
+  const progress = audioElement.currentTime / audioElement.duration;
+  const targetChars = Math.floor(progress * totalChars);
+
+  typewriterData.forEach(item => {
+    if (targetChars >= item.endChar) {
+      // Show all text
+      item.textContainer.textContent = item.text;
+    } else if (targetChars > item.startChar) {
+      // Show partial text
+      const charsToShow = targetChars - item.startChar;
+      item.textContainer.textContent = item.text.substring(0, charsToShow);
+    } else {
+      // Show no text
+      item.textContainer.textContent = '';
+    }
+  });
+}
+
+// Prepare typewriter when audio plays
+audioElement.addEventListener('play', () => {
+  prepareTypewriter();
+});
+</script>
+
+</body>
+</html>
