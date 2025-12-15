@@ -147,6 +147,39 @@
     background: rgba(0, 0, 0, 0.5);
     border-color: rgba(255, 255, 255, 0.5);
   }
+
+  .set-recording-button {
+    position: fixed;
+    top: calc(50% - 120px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-family: 'Lucida Console', monospace;
+    font-size: clamp(0.45rem, 1vh, 0.85rem);
+    letter-spacing: 0.3px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .set-recording-button:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .set-recording-button.moved {
+    top: auto;
+    bottom: 20px;
+    left: auto;
+    right: 20px;
+    transform: none;
+  }
 </style>
 </head>
 <body>
@@ -244,7 +277,7 @@ RULES:
 ⠀⠀⠀⠀⠀⠀⠀⠀⣠⣶⣶⣶⣦⠀⠀
 ⠀⠀⣠⣤⣤⣄⣀⣾⣿⠟⠛⠻⢿⣷⠀
 ⢰⣿⡿⠛⠙⠻⣿⣿⠁⠀⠀⠀⣶⢿⡇
-⢿⣿⣇   ⠈⠏see you soon <3
+⢿⣿⣇   ⠈⠏thank you for coming <3
 ⠻⣿⣷⣦⣤⣀⠀⠀⠀⠀⣾⡿⠃⠀
 ⠀⠀⠀⠀⠉⠉⠻⣿⣄⣴⣿⠟⠀⠀⠀    -srowe/telestai
 ⠀⠀⠀⠀⠀⠀⠀⣿⡿⠟⠁⠀⠀⠀⠀
@@ -259,6 +292,8 @@ RULES:
 </div>
 
 <a href="index.html" class="home-button">HOME</a>
+
+<a href="https://youtu.be/4SY1x9cFOy8?si=tsGOU-MBuYyXWcnG" class="set-recording-button" target="_blank">SET RECORDING</a>
 
 <script>
 // Sunset color progression (0-100%)
@@ -300,6 +335,7 @@ const audioPlayer = document.querySelector('.audio-player');
 const audioElement = document.querySelector('audio');
 const container = document.querySelector('.text-container');
 const starsContainer = document.getElementById('stars');
+const setRecordingButton = document.querySelector('.set-recording-button');
 let hasBeenPlayed = false;
 let animationFrameId = null;
 
@@ -346,6 +382,7 @@ function updateGradient() {
 audioElement.addEventListener('play', () => {
   if (!hasBeenPlayed) {
     audioPlayer.classList.add('playing');
+    setRecordingButton.classList.add('moved');
     hasBeenPlayed = true;
   }
   // Start smooth animation loop
