@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>telestai.info — about</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    background: #00152b;
+    color: #ffffff;
+    font-family: 'Lucida Console', monospace;
+    font-size: clamp(0.55rem, 1.2vh, 0.95rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.3px;
+    overflow: hidden;
+    touch-action: none;
+    position: fixed;
+    width: 100vw;
+  }
+  pre {
+    color: #88ccff;
+    font-size: inherit;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .box {
+    max-width: 340px;
+    width: 90vw;
+    text-align: left;
+  }
+  h2 {
+    font-size: 1.15rem;
+    margin-bottom: 20px;
+  }
+  a.home-button {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 6px 14px;
+    background: #000000;
+    color: #ffffff;
+    text-decoration: none;
+    border: 1px solid #ffffff;
+    border-radius: 8px;
+    font-family: 'Lucida Console', monospace;
+    font-size: inherit;
+    cursor: pointer;
+  }
+  a.home-button:hover {
+    background: #003366;
+  }
+</style>
+</head>
+<body>
+<div id="page-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000;z-index:9999;pointer-events:none;opacity:1;transition:opacity 1000ms ease-out;"></div>
+<script>
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  const overlay = document.getElementById('page-overlay');
+  overlay.style.opacity = '0';
+  setTimeout(() => { overlay.style.display = 'none'; }, 550);
+}));
+</script>
+<div class="box">
+  <h2>telestai.info</h2>
+  <pre>
+a place for things.
+
+access codes are distributed
+at events and to people.
+
+each code leads somewhere.
+
+</pre>
+  <a href="index.html" class="home-button">back</a>
+</div>
+</body>
+</html>

@@ -5,11 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>telestai.info</title>
 <style>
+  /*
+    Colors:
+      cream  #f5e6c8  -- text, borders
+      brown  #230e02  -- page background
+      black  #000000  -- terminal background
+      green  #6ab95c  -- prompt
+  */
+
+  html {
+    background: #230e02;
+  }
+
   body {
     margin: 0;
     height: 100vh;
-    background: #00152b;
-    color: #ffffff;
+    background: #230e02;
+    color: #f5e6c8;
     font-family: 'Lucida Console', monospace;
     font-size: clamp(0.45rem, 1vh, 0.85rem);
     display: flex;
@@ -22,65 +34,87 @@
     position: fixed;
     width: 100vw;
   }
-  h2 {
-    font-size: 1.15rem;
-    margin-bottom: 10px;
-    text-align: left;
-    width: 100%;
-    max-width: 270px;
-  }
-  @keyframes dots {
-    0%, 33% { content: '.'; }
-    34%, 66% { content: '..'; }
-    67%, 100% { content: '...'; }
-  }
-  .animated-text::after {
-    content: '.';
-    animation: dots 3s infinite;
-  }
-  input, button {
-    font-family: 'Lucida Console', monospace;
-    font-size: 1.05rem;
-    padding: 6px;
-    margin: 10px 0;
-    background: #000000;
-    color: #ffffff;
-    border: 1px solid #ffffff;
-    border-radius: 8px;
-  }
-  .code-input {
+  pre { margin-top: 20px; color: #f5e6c8; font-size: 0.8rem; }
+  .terminal-row {
     display: flex;
-    gap: 5px;
     align-items: center;
-    justify-content: center;
-    margin: 0 0 20px 0;
+    gap: 8px;
+    width: min(88vw, 420px);
   }
-  .code-box {
-    width: 32px;
-    height: 36px;
-    text-align: center;
-    font-size: 1.1rem;
-    text-transform: uppercase;
+  @media (min-width: 700px) {
+    .terminal-row { width: min(90vw, 800px); }
+  }
+  .terminal-window {
+    display: flex;
+    align-items: center;
+    background: #000000;
+    border: 1px solid #f5e6c8;
+    border-radius: 6px;
+    padding: 9px 14px;
+    flex: 1;
+    box-shadow: 0 0 24px rgba(0,0,0,0.6);
+    min-width: 0;
+  }
+  .prompt {
+    color: #6ab95c;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+    flex-shrink: 0;
+    font-size: clamp(0.6rem, 2.2vw, 0.85rem);
+  }
+  .terminal-input {
+    -webkit-appearance: none;
+    appearance: none;
+    color-scheme: dark;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #f5e6c8 !important;
+    -webkit-text-fill-color: #f5e6c8 !important;
+    -webkit-box-shadow: 0 0 0 1000px #000000 inset !important;
+    box-shadow: 0 0 0 1000px #000000 inset !important;
+    font-family: 'Lucida Console', monospace;
+    font-size: clamp(0.6rem, 2.2vw, 0.85rem);
+    flex: 1;
+    caret-color: #f5e6c8;
+    min-width: 0;
     padding: 0;
+    margin: 0;
+    opacity: 1;
+    border-radius: 0;
   }
-  .separator {
-    font-size: 1.2rem;
-    margin: 0 5px;
+  .terminal-input:focus {
+    -webkit-box-shadow: 0 0 0 1000px #000000 inset !important;
+    box-shadow: 0 0 0 1000px #000000 inset !important;
+    -webkit-text-fill-color: #f5e6c8 !important;
   }
-  button {
+  .submit-btn {
+    -webkit-appearance: none;
+    appearance: none;
+    color-scheme: dark;
+    font-family: 'Lucida Console', monospace;
+    font-size: clamp(0.6rem, 2.2vw, 0.85rem);
+    background-color: #000000 !important;
+    color: #f5e6c8 !important;
+    -webkit-text-fill-color: #f5e6c8 !important;
+    border: 1px solid #f5e6c8;
+    border-radius: 6px;
+    padding: 7px 10px;
     cursor: pointer;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
-  button:hover { background: #003366; }
-  pre { margin-top: 20px; color: #88ccff; font-size: 0.8rem; }
+  .submit-btn:hover, .submit-btn:active {
+    opacity: 0.7;
+  }
   .box {
     text-align: center;
   }
   .fade-out {
     opacity: 0;
-    transition: opacity 0.5s ease-out;
-  }
-  body.fade-background {
-    transition: background-color 1.5s ease-in-out;
+    transition: opacity 0.3s ease-out;
   }
 </style>
 </head>
@@ -88,24 +122,75 @@
 
 <div class="box">
 
-<h2 class="animated-text">enter access code</h2>
-<div class="code-input">
-  <input type="text" class="code-box" id="c1" maxlength="1" autofocus>
-  <input type="text" class="code-box" id="c2" maxlength="1">
-  <span class="separator">-</span>
-  <input type="text" class="code-box" id="c3" maxlength="1" inputmode="numeric" pattern="[0-9]">
-  <input type="text" class="code-box" id="c4" maxlength="1" inputmode="numeric" pattern="[0-9]">
-  <input type="text" class="code-box" id="c5" maxlength="1" inputmode="numeric" pattern="[0-9]">
-  <input type="text" class="code-box" id="c6" maxlength="1" inputmode="numeric" pattern="[0-9]">
+<div class="terminal-row">
+  <form class="terminal-window" onsubmit="check(); return false;">
+    <span class="prompt" id="prompt">visitor@... ~ %&nbsp;</span>
+    <input type="text" class="terminal-input" id="code" maxlength="11" autofocus autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+  </form>
+  <button class="submit-btn" onclick="check()">enter</button>
 </div>
-<button onclick="check()">submit</button>
 
 <div id="msg"></div>
 <div id="history"></div>
 </div>
 
+<div id="access-granted" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); font-family:'Lucida Console',monospace; color:#f5e6c8; font-size:clamp(0.7rem,2.5vw,1rem); white-space:nowrap; letter-spacing:0.3px; transition:opacity 0.4s ease-out;">&gt; <span style="color:#6ab95c;">ACCESS GRANTED</span> --&gt; redirecting...</div>
+
 <script>
-const CORRECT = "ts-0001";
+const CODE_PATTERN = /^[a-z]{2}-[a-z0-9]{3,8}$/;
+
+function getDeviceName() {
+  const ua = navigator.userAgent.toLowerCase();
+  if (/iphone/.test(ua)) return 'iphone';
+  if (/ipad/.test(ua)) return 'ipad';
+  if (/android/.test(ua)) return 'android';
+  if (/macintosh|mac os x/.test(ua)) return 'mac';
+  if (/windows/.test(ua)) return 'windows';
+  if (/linux/.test(ua)) return 'linux';
+  return null;
+}
+
+function getBrowserName() {
+  const ua = navigator.userAgent.toLowerCase();
+  if (/edg\//.test(ua)) return 'edge';
+  if (/opr\/|opera/.test(ua)) return 'opera';
+  if (/firefox/.test(ua)) return 'firefox';
+  if (/chrome/.test(ua)) return 'chrome';
+  if (/safari/.test(ua)) return 'safari';
+  return null;
+}
+
+async function getPublicIP() {
+  try {
+    const res = await fetch('https://api.ipify.org?format=json');
+    const data = await res.json();
+    return data.ip;
+  } catch {
+    return 'unknown';
+  }
+}
+
+(async () => {
+  const device = getDeviceName();
+  const browser = getBrowserName();
+  const label = device && browser ? `${device}-${browser}`
+              : device || browser || 'visitor';
+  const ip = await getPublicIP();
+  document.getElementById('prompt').textContent = `${label}@${ip} ~ % \u00a0`;
+})();
+
+// SHA-256 hashes of known page codes. To add a new page:
+//   echo -n "your-code" | shasum -a 256
+const KNOWN_HASHES = new Set([
+  "42e47f2fe6b7d410f0a5991928f14ca370d22656ce1a6990dbb23f3f86001e98", // ts-0001
+  "7e9d4370f98d07993360bd4758d90695bb55643f814b714c1075cdec92d6bf10", // ts-snri314
+  "a4262e1c9bcbc1721eb3fe13558154460a2b2a2d307daa32532478526ce6ccb1"  // about
+]);
+
+async function hashInput(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
 
 function getCookie(name) {
   const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -124,55 +209,54 @@ if (correctHistory.length) {
   document.getElementById("history").innerHTML = "<pre>used access codes:\n" + correctHistory.join("\n") + "</pre>";
 }
 
-// Auto-advance to next box on input
-const boxes = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'];
-boxes.forEach((id, index) => {
-  const box = document.getElementById(id);
-  box.addEventListener('input', (e) => {
-    if (e.target.value && index < boxes.length - 1) {
-      document.getElementById(boxes[index + 1]).focus();
-    }
-  });
-  box.addEventListener('keydown', (e) => {
-    if (e.key === 'Backspace' && !e.target.value && index > 0) {
-      document.getElementById(boxes[index - 1]).focus();
-    }
-  });
+// Auto-lowercase on input
+const codeInput = document.getElementById("code");
+codeInput.addEventListener('input', () => {
+  const pos = codeInput.selectionStart;
+  codeInput.value = codeInput.value.toLowerCase();
+  codeInput.setSelectionRange(pos, pos);
 });
 
-function check() {
-  const input = document.getElementById("c1").value +
-                document.getElementById("c2").value +
-                "-" +
-                document.getElementById("c3").value +
-                document.getElementById("c4").value +
-                document.getElementById("c5").value +
-                document.getElementById("c6").value;
+
+async function check() {
+  const input = document.getElementById("code").value.toLowerCase().trim();
   const msg = document.getElementById("msg");
+  const hash = await hashInput(input);
 
-  if (input.toLowerCase() === CORRECT) {
-    if (!correctHistory.includes(input.toLowerCase())) {
-      correctHistory.push(input.toLowerCase());
-      setCookie("correctHistory", correctHistory);
+  if (!KNOWN_HASHES.has(hash)) {
+    if (CODE_PATTERN.test(input)) {
+      msg.innerHTML = "<pre style='color:#ff5555'>theres no page for that code :((</pre>";
+    } else {
+      msg.innerHTML = "<pre style='color:#ff5555'>theres no page for that code :((\ncodes usually look like \"xx-something\"</pre>";
     }
-
-    // Hide the main content box
-    const box = document.querySelector('.box');
-    box.classList.add('fade-out');
-
-    // Add background transition class and start fade
-    document.body.classList.add('fade-background');
-    setTimeout(() => {
-      document.body.style.backgroundColor = 'rgb(135,206,235)';
-    }, 500);
-
-    // Redirect after animations complete
-    setTimeout(() => {
-      location.href = "ts-0001.html";
-    }, 2000);
-  } else {
-    msg.innerHTML = "<pre style='color:#ff5555'>PASSWORD DENIED</pre>";
+    return;
   }
+
+  if (!correctHistory.includes(input)) {
+    correctHistory.push(input);
+    setCookie("correctHistory", correctHistory);
+  }
+
+  // Fade out the input UI
+  document.querySelector('.box').classList.add('fade-out');
+
+  // Show access granted message
+  const granted = document.getElementById('access-granted');
+  setTimeout(() => {
+    granted.style.display = 'block';
+  }, 320);
+
+  // Fade message and background to black
+  setTimeout(() => {
+    document.body.style.transition = 'background-color 0.4s ease-out';
+    document.body.style.backgroundColor = '#000000';
+    granted.style.opacity = '0';
+  }, 1300);
+
+  // Redirect
+  setTimeout(() => {
+    location.href = input + ".html";
+  }, 2000);
 }
 </script>
 </body>

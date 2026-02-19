@@ -15,7 +15,7 @@
     height: 100%;
     overflow: hidden;
   }
-  
+
   body {
     margin: 0;
     height: 100vh;
@@ -30,7 +30,7 @@
     top: 0;
     left: 0;
     width: 100vw;
-    background-color: rgb(135,206,235);
+    background-color: rgb(8, 5, 25);
     transition: background 0.1s ease-out;
   }
 
@@ -78,7 +78,7 @@
   }
 
   .audio-player.playing {
-    top: 88%;
+    top: 95%;
     transform: translate(-50%, -50%);
   }
 
@@ -107,8 +107,8 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 1s ease-in;
+    opacity: 1;
+    transition: opacity 2s ease-out;
   }
 
   .star {
@@ -180,6 +180,20 @@
     right: 20px;
     transform: none;
   }
+
+  #sand {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 15vh;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .text-container {
+    z-index: 3;
+  }
 </style>
 </head>
 <body>
@@ -188,43 +202,38 @@
 
 <div id="stars"></div>
 
+<canvas id="sand"></canvas>
+
 <div class="text-container">
   <div class="typewriter" style="grid-area: header; justify-self: center; text-align: center;"><pre style="text-align: center;">
 
 
-|- - - - - WINTER-PICNIC-SUNSET-SET- - - - -|
+|- - - - - TITLE GOES HERE - - - - -|
 
---OPEN-INVITE--</pre></div>
+--DETAILS--</pre></div>
 
   <div class="typewriter" style="grid-area: d; text-align: left;"><pre>
 ON
-SUNDAY
-DECEMBER FOURTEENTH
-         TWENTY TWENTY-FIVE
+DAY
+DATE
 
   </pre></div>
 
   <div class="typewriter" style="grid-area: t; text-align: left;"><pre>
 @
-FOUR PM
+TIME
 UNTIL
-SEVEN FOURTY-FIVE PM (ISH)
+TIME
   </pre></div>
 
   <div class="typewriter" style="grid-area: l; text-align: left;"><pre>
 @
-LAKE EOLA PARK
-28.54497° N, 81.37117° W
-  (EAST SIDE, BY THE PAGODA)
-    [DAY OF UPDATES: 
-      @telestai.info ON IG]
+LOCATION
   </pre></div>
 
   <div class="typewriter" style="grid-area: i; text-align: left;"><pre>
 
-YOU ARE INVITED TO CELEBRATE
-  FOR NO PARTICULAR REASON
-    JUST BECAUSE WE CAN
+DESCRIPTION
 
 
 WITH
@@ -234,45 +243,30 @@ WITH
 
   <div class="typewriter" style="grid-area: and; text-align: center;">&</div>
 
-  <div class="typewriter" style="grid-area: picnic; text-align: center;">A PICNIC</div>
+  <div class="typewriter" style="grid-area: picnic; text-align: center;">SOMETHING</div>
 
   <div style="grid-area: img; display: flex; align-items: center; justify-content: center;">
-    <img id="circleImage" src="ab-1234.jpeg" alt="" style="width: clamp(60px, 12vw, 120px); height: clamp(60px, 12vw, 120px); border-radius: 50%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease-in;">
+    <img id="circleImage" src="" alt="" style="width: clamp(60px, 12vw, 120px); height: clamp(60px, 12vw, 120px); border-radius: 50%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease-in;">
   </div>
 
   <div class="typewriter" style="grid-area: md; text-align: left;"><pre>
-MUSIC (PROVIDED)
-e.g.
+COLUMN ONE
+details
 
-french touch
-jazz house
-U.K Garage
-prog. house
-disco
-trance 2.0
-w/ a sprinkle of bass ;)
-  </pre></div>
+</pre></div>
 
   <div class="typewriter" style="grid-area: pd; text-align: right;"><pre>
-PICNIC (PROVIDED BY YOU)
-bring your own:
+COLUMN TWO
+details
 
-blanket (picnic)
-blanket again (winter picnic)
-food/charcuterie
-drink/wine
-art stuff/kandi
-board game/frisbee/book
-holiday cheer :)
-  </pre></div>
+</pre></div>
 
   <div class="typewriter" style="grid-area: rules; text-align: left;"><pre>
-PLEASE ABIDE BY THE
-RULES:
-1. COME FOR THE MUSIC.
-2. BE OPEN TO UNFAMILIAR SOUNDS.
-3. FACE ONE ANOTHER, NOT THE DJ.
-4. BE PRESENT, NOT ONLINE.
+NOTES:
+1.
+2.
+3.
+4.
   </pre></div>
 
   <div class="typewriter" style="grid-area: signoff; text-align: left;"><pre>
@@ -295,8 +289,6 @@ RULES:
 
 <a href="index.html" class="home-button">HOME</a>
 
-<a href="https://youtu.be/WACbWv27LbA?si=oGmU1oNgtZcnLK2e" class="set-recording-button" target="_blank">SET RECORDING</a>
-
 <script>
 // Fade in from black
 requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -305,37 +297,28 @@ requestAnimationFrame(() => requestAnimationFrame(() => {
   setTimeout(() => { overlay.style.display = 'none'; }, 550);
 }));
 
-// Sunset color progression (0-100%)
+// Sunrise color progression (0-100%)
+// Colors ordered from center-bottom outward:
+// 0% = center-bottom (horizon glow), 100% = outer edges / top of sky
+// At t=100, shift=+55 puts deep orange stop exactly at 100% (top of screen)
 const sunsetColors = [
-  { percent: 0, color: [10, 10, 40] },       // deep midnight blue
-  { percent: 25, color: [50, 50, 120] },      // twilight purple-blue
-  { percent: 45, color: [255, 107, 107] },   // sunset pink/red
-  { percent: 60, color: [255, 183, 77] },    // sunset orange
-  { percent: 80, color: [100, 149, 237] },   // cornflower blue
-  { percent: 100, color: [135, 206, 235] }   // light sky blue
-  
+  { percent: 0,   color: [165, 215, 245] },  // clear morning sky (center-bottom)
+  { percent: 25,  color: [255, 180, 80] },   // golden horizon
+  { percent: 45,  color: [255, 120, 30] },   // deep orange/fiery
+  { percent: 62,  color: [200, 100, 140] },  // dawn rose/pink
+  { percent: 80,  color: [45, 20, 75] },     // pre-dawn indigo
+  { percent: 100, color: [8, 5, 25] }        // deep night (anchor for dark start)
 ];
 
-// Generate gradient based on animation progress (0-100)
+// Generate sunrise gradient based on animation progress (0-100)
+// Shift range: -100 (all dark) → +55 (deep orange sits at outer rim / top)
 function getRadialGradient(progress) {
-  // At 0%, entire screen is cornflower blue
-  // At 50%, mostly orange and pink/red
-  // At 100%, entire screen is deep midnight blue
-  // Colors sweep from top to bottom in an arc shape
-
-  const gradientStops = sunsetColors.map((stop, index) => {
+  const gradientStops = sunsetColors.map((stop) => {
     const color = stop.color;
-
-    // Shift gradient from bottom (-100%) to top (200%) as progress goes 0 to 100
-    // At 0%: gradient below viewport, screen shows first color (cornflower blue)
-    // At 100%: gradient above viewport, screen shows last color (midnight blue)
-    const shiftAmount = -100 + (progress / 100) * 200;
+    const shiftAmount = -100 + (progress / 100) * 155;
     const adjustedPercent = stop.percent + shiftAmount;
-
     return `rgb(${color[0]}, ${color[1]}, ${color[2]}) ${adjustedPercent}%`;
   });
-
-  // Create a radial gradient with ellipse at top center, creating a downward arc
   return `radial-gradient(ellipse 150% 100% at center bottom, ${gradientStops.join(', ')})`;
 }
 
@@ -344,7 +327,6 @@ const audioPlayer = document.querySelector('.audio-player');
 const audioElement = document.querySelector('audio');
 const container = document.querySelector('.text-container');
 const starsContainer = document.getElementById('stars');
-const setRecordingButton = document.querySelector('.set-recording-button');
 let hasBeenPlayed = false;
 let animationFrameId = null;
 
@@ -369,19 +351,13 @@ function updateGradient() {
     const progress = (audioElement.currentTime / audioElement.duration) * 100;
     document.body.style.background = getRadialGradient(progress);
 
-    // Show stars as animation finishes (70% onwards)
-    if (progress >= 50) {
-      const starOpacity = progress - 25; // starts appearing at 50%, fully visible at 100%
-      starsContainer.style.opacity = starOpacity;
-    } else {
-      starsContainer.style.opacity = 0;
-    }
+    // Stars fade out as sun rises (visible at pre-dawn, gone by midway)
+    starsContainer.style.opacity = Math.max(0, 1 - Math.max(0, progress - 30) / 30);
 
-    // Update typewriter progress
+    updateSandBrightness(progress);
     updateTypewriter();
   }
 
-  // Continue animation loop if audio is playing
   if (!audioElement.paused) {
     animationFrameId = requestAnimationFrame(updateGradient);
   }
@@ -391,10 +367,8 @@ function updateGradient() {
 audioElement.addEventListener('play', () => {
   if (!hasBeenPlayed) {
     audioPlayer.classList.add('playing');
-    setRecordingButton.classList.add('moved');
     hasBeenPlayed = true;
   }
-  // Start smooth animation loop
   if (animationFrameId === null) {
     updateGradient();
   }
@@ -415,7 +389,10 @@ audioElement.addEventListener('seeked', () => {
 });
 
 // Initialize gradient on load
-audioElement.addEventListener('loadedmetadata', updateGradient);
+audioElement.addEventListener('loadedmetadata', () => {
+  updateGradient();
+  updateSandBrightness(0);
+});
 
 // Typewriter effect synced to audio position
 let typewriterPrepared = false;
@@ -438,22 +415,19 @@ function prepareTypewriter() {
     [getElement('music')],
     [getElement('and')],
     [getElement('picnic')],
-    [getElement('md'), getElement('pd')], // Type both music and picnic columns simultaneously
+    [getElement('md'), getElement('pd')],
     [getElement('rules')],
     [getElement('signoff')]
   ];
 
-  // Store original text and prepare elements
   orderedElements.forEach((group, groupIndex) => {
     const groupStartChar = totalChars;
     let maxGroupLength = 0;
 
-    // Capture when md/pd group starts (index 8)
     if (groupIndex === 8) {
       imageRevealChar = groupStartChar;
     }
 
-    // First pass: calculate max length in group
     group.forEach(el => {
       if (el) {
         const preTag = el.querySelector('pre');
@@ -463,14 +437,12 @@ function prepareTypewriter() {
       }
     });
 
-    // Second pass: store data with same start char for all in group
     group.forEach(el => {
       if (el) {
         const preTag = el.querySelector('pre');
         const textContainer = preTag || el;
         const text = textContainer.textContent;
 
-        // Measure and preserve dimensions before clearing
         const height = el.offsetHeight;
 
         typewriterData.push({
@@ -481,7 +453,6 @@ function prepareTypewriter() {
           endChar: groupStartChar + text.length
         });
 
-        // Set min-height to prevent layout shift
         if (height > 0) {
           el.style.minHeight = `${height}px`;
         }
@@ -491,7 +462,6 @@ function prepareTypewriter() {
       }
     });
 
-    // Increment totalChars by the longest element in the group
     totalChars += maxGroupLength;
   });
 }
@@ -504,14 +474,11 @@ function updateTypewriter() {
 
   typewriterData.forEach(item => {
     if (targetChars >= item.endChar) {
-      // Show all text
       item.textContainer.textContent = item.text;
     } else if (targetChars > item.startChar) {
-      // Show partial text
       const charsToShow = targetChars - item.startChar;
       item.textContainer.textContent = item.text.substring(0, charsToShow);
     } else {
-      // Show no text
       item.textContainer.textContent = '';
     }
   });
@@ -520,6 +487,53 @@ function updateTypewriter() {
 // Prepare typewriter when audio plays
 audioElement.addEventListener('play', () => {
   prepareTypewriter();
+});
+
+// Sand canvas
+const sandCanvas = document.getElementById('sand');
+const sandCtx = sandCanvas.getContext('2d');
+let sandImageData = null;
+
+function initSand() {
+  sandCanvas.width = window.innerWidth;
+  sandCanvas.height = Math.round(window.innerHeight * 0.33);
+
+  const w = sandCanvas.width;
+  const h = sandCanvas.height;
+  const imgData = sandCtx.createImageData(w, h);
+  const data = imgData.data;
+
+  // Base daylight sand color
+  const baseR = 210, baseG = 175, baseB = 115;
+  const variation = 28;
+
+  for (let i = 0; i < w * h; i++) {
+    const v = Math.floor((Math.random() * 2 - 1) * variation);
+    data[i * 4 + 0] = Math.min(255, Math.max(0, baseR + v));
+    data[i * 4 + 1] = Math.min(255, Math.max(0, baseG + v));
+    data[i * 4 + 2] = Math.min(255, Math.max(0, baseB + v));
+    data[i * 4 + 3] = 255;
+  }
+
+  sandImageData = imgData;
+  sandCtx.putImageData(imgData, 0, 0);
+}
+
+function updateSandBrightness(progress) {
+  // 12% brightness at night, 100% at full sunrise
+  const brightness = 0.12 + (progress / 100) * 0.88;
+  sandCanvas.style.filter = `brightness(${brightness})`;
+}
+
+initSand();
+updateSandBrightness(0);
+
+window.addEventListener('resize', () => {
+  initSand();
+  if (audioElement.duration) {
+    const progress = (audioElement.currentTime / audioElement.duration) * 100;
+    updateSandBrightness(progress);
+  }
 });
 </script>
 

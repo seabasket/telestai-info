@@ -1,0 +1,7 @@
+{
+  "name": "telestai-info",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx browser-sync start --server --files '**/*.html, **/*.css, **/*.js' --no-notify"
+  }
+}
