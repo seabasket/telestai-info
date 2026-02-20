@@ -41,7 +41,7 @@
   right: 10px;
   bottom: 15%;
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: 1fr 0.3fr 1fr;
   grid-template-rows: auto auto auto auto auto auto auto;
   grid-template-areas:
     "header header header"
@@ -55,15 +55,19 @@
   gap: clamp(3px, 0.8vh, 10px);
   align-items: start;
   text-align: center;
-  font-size: clamp(0.45rem, 1vh, 0.85rem);
+  font-size: clamp(0.4rem, 0.85vh, 0.75rem);
   letter-spacing: 0.3px;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   opacity: 1;
   overflow: hidden;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 .text-container .typewriter {
   opacity: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
 }
 
   .audio-player {
@@ -98,6 +102,9 @@
   pre {
     margin: 0;
     padding: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   #stars {
@@ -127,9 +134,9 @@
 
   .home-button {
     position: fixed;
-    bottom: 20px;
+    top: 20px;
     left: 20px;
-    padding: 10px 20px;
+    padding: 5px 10px;
     background: rgba(0, 0, 0, 0.3);
     color: #ffffff;
     text-decoration: none;
@@ -181,6 +188,16 @@
     transform: none;
   }
 
+  #water {
+    position: fixed;
+    bottom: 15vh;
+    left: 0;
+    width: 100%;
+    height: 10vh;
+    z-index: 1;
+    pointer-events: none;
+  }
+
   #sand {
     position: fixed;
     bottom: 0;
@@ -202,87 +219,107 @@
 
 <div id="stars"></div>
 
+<canvas id="water"></canvas>
 <canvas id="sand"></canvas>
 
 <div class="text-container">
   <div class="typewriter" style="grid-area: header; justify-self: center; text-align: center;"><pre style="text-align: center;">
+|- - - - - TS-SNRI314 - - - - -|
 
-
-|- - - - - TITLE GOES HERE - - - - -|
-
---DETAILS--</pre></div>
+--OPEN-INVITE!--</pre></div>
 
   <div class="typewriter" style="grid-area: d; text-align: left;"><pre>
 ON
-DAY
-DATE
-
+SATURDAY
+MARCH FOURTEENTH 
+    TWENTY TWENTY-SIX
   </pre></div>
 
   <div class="typewriter" style="grid-area: t; text-align: left;"><pre>
 @
-TIME
+5:30 AM! (YES IN THE MORNING!!)
 UNTIL
-TIME
+9:00 AM-ISH (ON BEACH TIIIME ;)
   </pre></div>
 
-  <div class="typewriter" style="grid-area: l; text-align: left;"><pre>
+  <div class="typewriter" style="grid-area: l; text-align: right;"><pre>
 @
-LOCATION
+HIGHTOWER BEACH
+28°11'31.0"N 80°35'36.2"W
+[DAY OF/DAY BEFORE UPDATES:
+here and @telestai.info on IG]
   </pre></div>
 
   <div class="typewriter" style="grid-area: i; text-align: left;"><pre>
-
-DESCRIPTION
-
+YOU ARE INVITED TO CELEBRATE
+    FOR NO PARTICULAR REASON
+      JUST BECAUSE WE CAN
 
 WITH
   </pre></div>
 
-  <div class="typewriter" style="grid-area: music; text-align: center;">MUSIC</div>
+  <div class="typewriter" style="grid-area: music; text-align: center;">MUSIC (PROVIDED)</div>
 
   <div class="typewriter" style="grid-area: and; text-align: center;">&</div>
 
-  <div class="typewriter" style="grid-area: picnic; text-align: center;">SOMETHING</div>
+  <div class="typewriter" style="grid-area: picnic; text-align: center;">A PICNIC (PROVIDED BY YOU)</div>
 
   <div style="grid-area: img; display: flex; align-items: center; justify-content: center;">
     <img id="circleImage" src="" alt="" style="width: clamp(60px, 12vw, 120px); height: clamp(60px, 12vw, 120px); border-radius: 50%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease-in;">
   </div>
 
   <div class="typewriter" style="grid-area: md; text-align: left;"><pre>
-COLUMN ONE
-details
+THE MUSIC (WILL FOLLOW THE LIGHT)
+think.....
 
+- dark 5AM wubs/grooves
+- dreamy, new trancy prog. house
+- "2013 on the bus headphones in edm nostalgia" core
+- jazzy stuff? reggae? we will seeeee
+- "Drinking orange juice in the sand at 7:30AM with some new friends" core
+- whatever else i feel like :)))
+
+plus a @dj_rude_boy daytime set whatttt
 </pre></div>
 
   <div class="typewriter" style="grid-area: pd; text-align: right;"><pre>
-COLUMN TWO
-details
+ITS A BEACH PICNIC (SO DO AND BRING PICNIC STUFF)
+think.....
 
+journal/art supplies!!!
+towel/blanket (beach)
+change of swimsuit (beach)
+surf/skimboard? (beach 3x)
+food/breakfast (yum)
+frisbee/ball/flow (yeah)
+etc etc etc you get it
 </pre></div>
 
   <div class="typewriter" style="grid-area: rules; text-align: left;"><pre>
-NOTES:
-1.
-2.
-3.
-4.
+PLEASE ABIDE BY THE
+RULES:
+1. COME FOR THE MUSIC 
+    AND BE OPEN TO UNFAMILIAR SOUNDS.
+2. FACE ONE ANOTHER, NOT THE DJ.
+3. GET TO KNOW SOMEONE YOU DONT YET.
+4. BE PRESENT, NOT ONLINE.
+5. PRACTICE PLUR. 
   </pre></div>
 
   <div class="typewriter" style="grid-area: signoff; text-align: left;"><pre>
 ⠀⠀⠀⠀⠀⠀⠀⠀⣠⣶⣶⣶⣦⠀⠀
 ⠀⠀⣠⣤⣤⣄⣀⣾⣿⠟⠛⠻⢿⣷⠀
 ⢰⣿⡿⠛⠙⠻⣿⣿⠁⠀⠀⠀⣶⢿⡇
-⢿⣿⣇   ⠈⠏thank you for coming <3
+⢿⣿⣇   ⠈⠏see you soon <3
 ⠻⣿⣷⣦⣤⣀⠀⠀⠀⠀⣾⡿⠃⠀
-⠀⠀⠀⠀⠉⠉⠻⣿⣄⣴⣿⠟⠀⠀⠀    -srowe/telestai
+⠀⠀⠀⠀⠉⠉⠻⣿⣄⣴⣿⠟⠀⠀⠀    -telestai
 ⠀⠀⠀⠀⠀⠀⠀⣿⡿⠟⠁⠀⠀⠀⠀
 </pre></div>
 </div>
 
 <div class="audio-player">
   <audio controls>
-    <source src="251214-wpss.mp3" type="audio/mpeg">
+    <source src="/ts-snri314/ts-snri314.mp3" type="audio/mpeg"> 
     Your browser does not support the audio element.
   </audio>
 </div>
@@ -355,6 +392,7 @@ function updateGradient() {
     starsContainer.style.opacity = Math.max(0, 1 - Math.max(0, progress - 30) / 30);
 
     updateSandBrightness(progress);
+    updateWaterBrightness(progress);
     updateTypewriter();
   }
 
@@ -392,6 +430,7 @@ audioElement.addEventListener('seeked', () => {
 audioElement.addEventListener('loadedmetadata', () => {
   updateGradient();
   updateSandBrightness(0);
+  updateWaterBrightness(0);
 });
 
 // Typewriter effect synced to audio position
@@ -528,11 +567,53 @@ function updateSandBrightness(progress) {
 initSand();
 updateSandBrightness(0);
 
+// Water canvas
+const waterCanvas = document.getElementById('water');
+const waterCtx = waterCanvas.getContext('2d');
+let waterImageData = null;
+
+function initWater() {
+  waterCanvas.width = window.innerWidth;
+  waterCanvas.height = Math.round(window.innerHeight * 0.20);
+
+  const w = waterCanvas.width;
+  const h = waterCanvas.height;
+  const imgData = waterCtx.createImageData(w, h);
+  const data = imgData.data;
+
+  // Base water color - turquoise/ocean blue
+  const baseR = 65, baseG = 145, baseB = 165;
+  const variation = 10;
+
+  // Fill with smooth water color
+  for (let i = 0; i < w * h; i++) {
+    const v = Math.floor((Math.random() * 2 - 1) * variation);
+    data[i * 4 + 0] = Math.min(255, Math.max(0, baseR + v));
+    data[i * 4 + 1] = Math.min(255, Math.max(0, baseG + v));
+    data[i * 4 + 2] = Math.min(255, Math.max(0, baseB + v));
+    data[i * 4 + 3] = 255;
+  }
+
+  waterImageData = imgData;
+  waterCtx.putImageData(imgData, 0, 0);
+}
+
+function updateWaterBrightness(progress) {
+  // 8% brightness at night, 100% at full sunrise
+  const brightness = 0.08 + (progress / 100) * 0.92;
+  waterCanvas.style.filter = `brightness(${brightness})`;
+}
+
+initWater();
+updateWaterBrightness(0);
+
 window.addEventListener('resize', () => {
   initSand();
+  initWater();
   if (audioElement.duration) {
     const progress = (audioElement.currentTime / audioElement.duration) * 100;
     updateSandBrightness(progress);
+    updateWaterBrightness(progress);
   }
 });
 </script>
