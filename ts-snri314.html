@@ -430,6 +430,13 @@ audioElement.addEventListener('seeked', () => {
   updateTypewriter();
 });
 
+// Initialize gradient on load
+audioElement.addEventListener('loadedmetadata', () => {
+  updateGradient();
+  updateSandBrightness(0);
+  updateWaterBrightness(0);
+});
+
 // Typewriter effect synced to audio position
 let typewriterPrepared = false;
 let typewriterData = [];
