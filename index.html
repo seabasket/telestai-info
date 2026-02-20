@@ -341,6 +341,14 @@ const accessGrantedMessages = [
   "seeyaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 ];
 
+// Welcome back messages (shown when returning from another telestai.info page)
+const welcomeBackMessages = [
+  "oh hey you're back!",
+  "how was it?",
+  "cool cool",
+  "ok back to what i was saying..."
+];
+
 // Typewriter effect
 const phrases = [
   "hello!!!!",
@@ -362,11 +370,11 @@ const phrases = [
   "because it always had its WINDOWS open!",
   "*fozzy voice* wocka wockaaaaa",
   "https://www.youtube.com/watch?v=8eXj97stbG8",
-  "... I use Arch btw",
+  "... I use Arch btw (i do not use Arch)",
   "ok this is getting old im gonna loop around now. bye!",
   "hello!!!!",
   "have an access code?",
-  "you can put it her-AHHHHHHHH",
+  "you can put it her-SIIIIIIIIKE",
   "JK IM STIL HERE",
   "JAJAHAHAH",
   "ooh i accidentally typed a J...    dalé",
@@ -386,7 +394,8 @@ const phrases = [
   "in that case....",
   "im phrases... ",
   "....const phrases",
-  "james bond says his name 1.5 time when he introduces himself btw",
+  "james bond says his name 1.5 times when he introduces himself btw",
+  "BREAKING: Men's House has morning prayer tomorrow.",
   "having to d3let myself after every line is mad annoying",
   "just so u kno",
   "hello!!!!       -what-",
@@ -442,6 +451,29 @@ let typewriterSpeed = 50;
 let isAccessGrantedMode = false;
 let typewriterTimeout = null;
 
+// Welcome back mode
+let isWelcomeBackMode = false;
+let welcomeBackIndex = 0;
+let savedPhraseIndex = 0;
+
+// Check if returning from another telestai.info page
+const referrer = document.referrer;
+const isReturning = referrer && referrer.includes('telestai.info') && !referrer.endsWith('index.html');
+
+if (isReturning) {
+  // Get saved phrase index from sessionStorage
+  const saved = sessionStorage.getItem('phraseIndex');
+  if (saved !== null) {
+    savedPhraseIndex = parseInt(saved, 10);
+    isWelcomeBackMode = true;
+  }
+}
+
+// Save phrase index before leaving page
+window.addEventListener('beforeunload', () => {
+  sessionStorage.setItem('phraseIndex', phraseIndex.toString());
+});
+
 function showAccessGrantedMessage() {
   // Stop the current typewriter
   if (typewriterTimeout) {
@@ -472,8 +504,18 @@ function showAccessGrantedMessage() {
 function typeWriter() {
   if (isAccessGrantedMode) return;
   const typewriterElement = document.getElementById('typewriter');
-  const currentPhrase = phrases[phraseIndex];
-  const isFastPhrase = currentPhrase.length > 100;
+
+  // Determine which phrase array to use
+  let currentPhrase;
+  let isFastPhrase;
+
+  if (isWelcomeBackMode) {
+    currentPhrase = welcomeBackMessages[welcomeBackIndex];
+    isFastPhrase = currentPhrase.length > 100;
+  } else {
+    currentPhrase = phrases[phraseIndex];
+    isFastPhrase = currentPhrase.length > 100;
+  }
 
   if (isDeleting) {
     typewriterElement.textContent = currentPhrase.substring(0, charIndex - 1);
@@ -491,7 +533,18 @@ function typeWriter() {
     isDeleting = true;
   } else if (isDeleting && charIndex === 0) {
     isDeleting = false;
-    phraseIndex = (phraseIndex + 1) % phrases.length;
+
+    if (isWelcomeBackMode) {
+      welcomeBackIndex++;
+      // Check if we've finished all welcome back messages
+      if (welcomeBackIndex >= welcomeBackMessages.length) {
+        isWelcomeBackMode = false;
+        phraseIndex = savedPhraseIndex; // Resume at saved position
+      }
+    } else {
+      phraseIndex = (phraseIndex + 1) % phrases.length;
+    }
+
     typewriterSpeed = 500;
   }
 
