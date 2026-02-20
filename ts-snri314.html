@@ -401,6 +401,10 @@ function updateGradient() {
   }
 }
 
+// Set initial night sky gradient immediately on page load
+document.body.style.background = getRadialGradient(0);
+starsContainer.style.opacity = 1;
+
 // Audio player position animation - lock in place after first play
 audioElement.addEventListener('play', () => {
   if (!hasBeenPlayed) {
