@@ -319,7 +319,7 @@ RULES:
 
 <div class="audio-player">
   <audio controls>
-    <source src="/ts-snri314/ts-snri314.mp3" type="audio/mpeg"> 
+    <source src="ts-snri314/ts-snri314.mp3" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
 </div>
@@ -428,13 +428,6 @@ audioElement.addEventListener('pause', () => {
 audioElement.addEventListener('seeked', () => {
   updateGradient();
   updateTypewriter();
-});
-
-// Initialize gradient on load
-audioElement.addEventListener('loadedmetadata', () => {
-  updateGradient();
-  updateSandBrightness(0);
-  updateWaterBrightness(0);
 });
 
 // Typewriter effect synced to audio position
