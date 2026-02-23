@@ -189,7 +189,8 @@
 <div class="terminal-row">
   <form class="terminal-window" onsubmit="check(); return false;">
     <span class="prompt" id="prompt">visitor@... ~ %&nbsp;</span>
-    <input type="text" class="terminal-input" id="code" maxlength="11" autofocus autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+    <input type="text" class="terminal-input" id="code" maxlength="11" autofocus autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go">
+    <input type="submit" style="display:none">
   </form>
   <button class="submit-btn" onclick="check()">enter</button>
 </div>
