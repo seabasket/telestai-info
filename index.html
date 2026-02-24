@@ -186,14 +186,13 @@
   <span class="typewriter-text" id="typewriter"></span>
 </div>
 
-<div class="terminal-row">
-  <form class="terminal-window" onsubmit="check(); return false;">
+<form class="terminal-row" onsubmit="check(); return false;">
+  <div class="terminal-window">
     <span class="prompt" id="prompt">visitor@... ~ %&nbsp;</span>
     <input type="text" class="terminal-input" id="code" maxlength="11" autofocus autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go">
-    <input type="submit" style="opacity:0;position:absolute;width:0;height:0;pointer-events:none;">
-  </form>
-  <button class="submit-btn" onclick="check()">enter</button>
-</div>
+  </div>
+  <button type="submit" class="submit-btn">enter</button>
+</form>
 
 <div id="msg"></div>
 <div id="history"></div>
@@ -282,14 +281,6 @@ codeInput.addEventListener('input', () => {
   const pos = codeInput.selectionStart;
   codeInput.value = codeInput.value.toLowerCase();
   codeInput.setSelectionRange(pos, pos);
-});
-
-// Explicit Enter key handler for mobile browser compatibility
-codeInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    check();
-  }
 });
 
 
