@@ -326,6 +326,8 @@ RULES:
 
 <a href="index.html" class="home-button">HOME</a>
 
+<a href="https://youtu.be/UPZNyQzE-CA" class="set-recording-button" target="_blank">SET RECORDING</a>
+
 <script>
 // Fade in from black
 requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -364,6 +366,7 @@ const audioPlayer = document.querySelector('.audio-player');
 const audioElement = document.querySelector('audio');
 const container = document.querySelector('.text-container');
 const starsContainer = document.getElementById('stars');
+const setRecordingButton = document.querySelector('.set-recording-button');
 let hasBeenPlayed = false;
 let animationFrameId = null;
 
@@ -409,6 +412,7 @@ starsContainer.style.opacity = 1;
 audioElement.addEventListener('play', () => {
   if (!hasBeenPlayed) {
     audioPlayer.classList.add('playing');
+    setRecordingButton.classList.add('moved');
     hasBeenPlayed = true;
   }
   if (animationFrameId === null) {
