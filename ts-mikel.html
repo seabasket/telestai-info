@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>telestai.info</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Lucida Console', monospace;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to bottom, #EB2627, #1434A4);
+    letter-spacing: 0.3px;
+  }
+
+  .label {
+    font-size: clamp(0.45rem, 1.2vh, 0.75rem);
+    text-align: center;
+    margin-bottom: 24px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .req-btn {
+    font-family: 'Lucida Console', monospace;
+    font-size: clamp(0.45rem, 1.2vh, 0.75rem);
+    letter-spacing: 0.3px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    padding: 8px 20px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    backdrop-filter: blur(10px);
+    transition: background 0.2s ease, border-color 0.2s ease;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+  }
+
+  .req-btn:hover, .req-btn:active {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.7);
+  }
+
+  .home-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    font-family: 'Lucida Console', monospace;
+    font-size: clamp(0.45rem, 1vh, 0.85rem);
+    letter-spacing: 0.3px;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .home-button:hover {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+</style>
+</head>
+<body>
+
+<div id="page-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000;z-index:9999;pointer-events:none;opacity:1;transition:opacity 0.5s ease-out;"></div>
+
+<a href="index.html" class="home-button">HOME</a>
+
+<p class="label">Mike L's music reqs....</p>
+
+<div class="buttons">
+  <a href="https://youtu.be/WVUFo7Axp9wa" class="req-btn" target="_blank">MUSIC REQ 1</a>
+  <a href="https://m.youtube.com/watch?v=4_u7iOCy5GM&pp=ygUTU3BpZHJybWFuIDkwcyB0aGVtZdIHCQnFCgGHKiGM7w%3D%3D" class="req-btn" target="_blank">MUSIC REQ 2</a>
+  <a href="https://m.youtube.com/watch?v=YjmU93_oE7E&pp=ygURYWNlIGNvbWJhdCA1IHplcm8%3D" class="req-btn" target="_blank">MUSIC REQ 3</a>
+</div>
+
+<script>
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  const overlay = document.getElementById('page-overlay');
+  overlay.style.opacity = '0';
+  setTimeout(() => { overlay.style.display = 'none'; }, 550);
+}));
+</script>
+
+</body>
+</html>
