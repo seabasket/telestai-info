@@ -1,0 +1,26 @@
+# Single source of truth for access-code pages.
+#
+# The code a visitor types on index.html IS the page's filename stem, and it
+# is checked against the SHA-256 hashes below (see index.html). To add a page:
+#   1. create <slug>.html at the repo root (front matter: layout: default or event)
+#   2. get the hash:  printf '%s' "your-slug" | shasum -a 256
+#   3. add an entry here with that hash
+#
+# A future backend/dashboard can read or write this same file as the canonical
+# list of pages + metadata.
+- slug: ts-0001
+  file: ts-0001.html
+  title: "WINTER-PICNIC-SUNSET-SET"
+  sha256: "42e47f2fe6b7d410f0a5991928f14ca370d22656ce1a6990dbb23f3f86001e98"
+- slug: ts-snri314
+  file: ts-snri314.html
+  title: "TS-SNRI314"
+  sha256: "7e9d4370f98d07993360bd4758d90695bb55643f814b714c1075cdec92d6bf10"
+- slug: about
+  file: about.html
+  title: "about"
+  sha256: "a4262e1c9bcbc1721eb3fe13558154460a2b2a2d307daa32532478526ce6ccb1"
+- slug: ts-mikel
+  file: ts-mikel.html
+  title: "Mike L's music reqs"
+  sha256: "6a3b64770be1d514f19722df69c5d0ad0c225d4bd797811ea598fe95882e0745"

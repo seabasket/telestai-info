@@ -1,0 +1,19 @@
+title: "telestai.info"
+description: "playground for web dev and using ai agents in coding"
+
+# Keep the published site limited to what's actually meant to be served.
+# (_layouts, _includes, _data, and dotfiles are already excluded from _site
+# by Jekyll's built-in defaults — these are the extra dev-only files.)
+exclude:
+  - README.md
+  - package.json
+  - package-lock.json
+  - node_modules
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+# No permalink overrides: every page is a root-level file in -> root-level
+# file out, which is what index.html's `location.href = code + ".html"`
+# redirect depends on. No url/baseurl either — the site is served from the
+# custom-domain root via CNAME, so relative links keep working unchanged.

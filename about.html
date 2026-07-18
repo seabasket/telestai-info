@@ -1,9 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>telestai.info — about</title>
+---
+layout: default
+title: "telestai.info — about"
+viewport: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+overlay_transition: "1000ms ease-out"
+---
 <style>
   body {
     margin: 0;
@@ -58,33 +58,23 @@
     background: #003366;
   }
 </style>
-</head>
-<body>
-<div id="page-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000;z-index:9999;pointer-events:none;opacity:1;transition:opacity 1000ms ease-out;"></div>
-<script>
-requestAnimationFrame(() => requestAnimationFrame(() => {
-  const overlay = document.getElementById('page-overlay');
-  overlay.style.opacity = '0';
-  setTimeout(() => { overlay.style.display = 'none'; }, 550);
-}));
-</script>
 <div class="box">
   <h2>about</h2>
   <pre>
 TETELESTAI - adjective
     - origin: Greek
-    - translation:  "It is finished.", 
+    - translation:  "It is finished.",
                     "Completed"
 
 TELESTAI - noun
     - origin: Orlandooooo (Orlandooo) ily orlando
-    - sounds cool enough 
+    - sounds cool enough
       ("just pick something!")
-    - moniker of a dude who plays/makes some 
+    - moniker of a dude who plays/makes some
       music and maybe some other stuff
 
 
-this site is just a little playground 
+this site is just a little playground
 where i can share things i make.
 
 sometimes itll be music,
@@ -96,12 +86,10 @@ or something else entirely.
 
 this page is accessed by codes and codes only.
 this is for the very important reason
-of it being cool. 
+of it being cool.
 
 -telestai <3
 
 </pre>
-  <a href="index.html" class="home-button">back</a>
+  {% include home-button.html label="back" %}
 </div>
-</body>
-</html>

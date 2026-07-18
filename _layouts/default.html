@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="{{ page.viewport | default: 'width=device-width, initial-scale=1.0, viewport-fit=cover' }}">
+<title>{{ page.title | default: site.title }}</title>
+{%- for sheet in page.stylesheets %}
+<link rel="stylesheet" href="{{ sheet | relative_url }}">
+{%- endfor %}
+{%- for src in page.head_scripts %}
+<script src="{{ src | relative_url }}"></script>
+{%- endfor %}
+</head>
+<body>
+{% include page-overlay.html transition=page.overlay_transition %}
+{{ content }}
+</body>
+</html>

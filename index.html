@@ -1,3 +1,6 @@
+---
+title: telestai.info
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -245,13 +248,13 @@ async function getPublicIP() {
   document.getElementById('prompt').textContent = `${label}@${ip} ~ % \u00a0`;
 })();
 
-// SHA-256 hashes of known page codes. To add a new page:
-//   echo -n "your-code" | shasum -a 256
+// SHA-256 hashes of known page codes, generated at build time from
+// _data/access_codes.yml. To add a new page: create <code>.html, then add an
+// entry to that file (hash via: printf '%s' "your-code" | shasum -a 256).
 const KNOWN_HASHES = new Set([
-  "42e47f2fe6b7d410f0a5991928f14ca370d22656ce1a6990dbb23f3f86001e98", // ts-0001
-  "7e9d4370f98d07993360bd4758d90695bb55643f814b714c1075cdec92d6bf10", // ts-snri314
-  "a4262e1c9bcbc1721eb3fe13558154460a2b2a2d307daa32532478526ce6ccb1", // about
-  "6a3b64770be1d514f19722df69c5d0ad0c225d4bd797811ea598fe95882e0745"  // ts-mikel
+{%- for code in site.data.access_codes %}
+  "{{ code.sha256 }}", // {{ code.slug }}
+{%- endfor %}
 ]);
 
 // Pure-JS SHA-256 fallback for browsers that restrict crypto.subtle (e.g. Instagram IAB)
