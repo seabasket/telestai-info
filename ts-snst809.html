@@ -14,23 +14,46 @@ head_scripts:
   }
 
   /* The animated sky lives on this layer (not the body) so it can be revealed
-     with an expanding circle from the center on first play. */
+     with a soft, feathered radial wipe from the center on first play (the wipe
+     itself is a JS-animated radial mask -- see the script below). */
   #sky {
     position: fixed;
     inset: 0;
     z-index: 0;
-    clip-path: circle(0% at 50% 50%);
-    transition: clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    clip-path: circle(0% at 50% 50%); /* fully hidden until the reveal starts */
   }
-  #sky.revealed {
-    clip-path: circle(150% at 50% 50%);
+
+  /* Compact round play/pause button (replaces the long native audio control). */
+  #play-btn {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    transition: background 0.3s ease, transform 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
   }
+  #play-btn:hover { background: rgba(255, 255, 255, 0.22); }
+  #play-btn:active { transform: scale(0.94); }
+  #play-btn svg { width: 30px; height: 30px; display: block; }
+  #play-btn .ic-pause { display: none; }
+  #play-btn.is-playing .ic-play { display: none; }
+  #play-btn.is-playing .ic-pause { display: block; }
+  /* the play triangle looks centered when nudged slightly right */
+  #play-btn .ic-play { transform: translateX(2px); }
 
   /* "press me ->" prompt sitting just left of the centered play button. */
   #press-me {
     position: fixed;
     top: 50%;
-    right: calc(50% + 118px);
+    right: calc(50% + 48px);
     transform: translateY(-50%);
     z-index: 60;
     color: #f5e6c8;
@@ -122,7 +145,13 @@ head_scripts:
 </div>
 
 <div class="audio-player">
-  <audio controls>
+  <button id="play-btn" type="button" aria-label="play">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <polygon class="ic-play" points="6,4 20,12 6,20"></polygon>
+      <g class="ic-pause"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></g>
+    </svg>
+  </button>
+  <audio>
     <source src="{{ '/assets/audio/ts-snst809.mp3' | relative_url }}" type="audio/mpeg">
     Your browser does not support the audio element.
   </audio>
@@ -154,7 +183,7 @@ const PULSE_CONFIG = {
 
 // Sunset timing / sky progression (independent of the music pulse above).
 const SKY_CONFIG = {
-  sunsetStart: 55,   // % of the track that stays full daytime before the sunset begins (higher = longer day)
+  sunsetStart: 10,   // % of the track that stays full daytime before the sunset begins (higher = longer day)
   startShift: 100,   // gradient position at the start; higher = more of the screen is clear light-blue day
   endShift: -100,    // gradient position at full night
   starsStart: 45,    // point in the sunset (0-100, measured after the day hold) when stars begin to appear
@@ -173,6 +202,7 @@ const audioElement = document.querySelector('audio');
 const starsContainer = document.getElementById('stars');
 const skyEl = document.getElementById('sky');
 const pressMe = document.getElementById('press-me');
+const playBtn = document.getElementById('play-btn');
 // No "SET RECORDING" button on this page (the set hasn't happened yet) --
 // event-engine.js's wire() still expects an element to toggle a class on,
 // so we hand it a detached element that's never inserted into the DOM.
@@ -247,11 +277,44 @@ function applyFrame(progress, level) {
 // ready to be revealed on first play. Until then the black body shows through.
 applyFrame(0, 0);
 
-// First play: reveal the light-blue sky radially from the center over the
-// black intro, and dismiss the "press me" prompt. The rest of the animation
-// (driven by wire() below) then continues as normal.
+// Compact play/pause button drives the (control-less) audio element. Pressing
+// it starts the music AND kicks off the reveal in the same tap.
+playBtn.addEventListener('click', function () {
+  if (audioElement.paused) {
+    audioElement.play().catch(function () {});
+  } else {
+    audioElement.pause();
+  }
+});
+audioElement.addEventListener('play', function () { playBtn.classList.add('is-playing'); });
+audioElement.addEventListener('pause', function () { playBtn.classList.remove('is-playing'); });
+
+// First play: reveal the light-blue sky from the center over the black intro
+// with a soft, feathered radial wipe (black -> blue fades as a gradient), and
+// dismiss the "press me" prompt. The rest of the animation continues as normal.
+var REVEAL_MS = 1100;   // reveal duration (slower than the old 600ms)
+var FEATHER = 34;       // softness of the black->blue edge, in % of the viewport
+function skyMask(p) {
+  // Opaque radius sweeps from just-hidden to just past the far corner (108%),
+  // so the whole duration is the visible reveal; the trailing FEATHER makes
+  // the black->blue boundary a soft gradient rather than a hard circle.
+  var r = -FEATHER + p * (108 + FEATHER);
+  return 'radial-gradient(circle at 50% 50%, #000 ' + r + '%, rgba(0,0,0,0) ' + (r + FEATHER) + '%)';
+}
 audioElement.addEventListener('play', function () {
-  skyEl.classList.add('revealed');
+  skyEl.style.webkitMaskImage = skyEl.style.maskImage = skyMask(0);
+  skyEl.style.webkitMaskRepeat = skyEl.style.maskRepeat = 'no-repeat';
+  skyEl.style.clipPath = 'none'; // hand visibility over to the mask
+  var start = performance.now();
+  (function step(now) {
+    var p = Math.min(1, (now - start) / REVEAL_MS);
+    // easeInOutCubic -- a gentle, even expansion (no quick rush at the start)
+    var eased = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+    var m = skyMask(eased);
+    skyEl.style.webkitMaskImage = skyEl.style.maskImage = m;
+    if (p < 1) requestAnimationFrame(step);
+    else { skyEl.style.webkitMaskImage = skyEl.style.maskImage = 'none'; }
+  })(performance.now());
   pressMe.style.opacity = '0';
   setTimeout(function () { pressMe.style.display = 'none'; }, 400);
 }, { once: true });
