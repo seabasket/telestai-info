@@ -31,15 +31,19 @@ window.TelestaiEvent = (function () {
   // `origin` is the CSS radial-gradient position (default 'center bottom').
   // `extraShift` is an additional flat percent offset applied to every stop
   // (default 0), for effects like a music-driven wobble layered on top.
-  function radialGradient(stops, shiftStart, shiftEnd, progress, origin, extraShift) {
+  // `sizeW`/`sizeH` are the ellipse width/height in % (default 150/100), so a
+  // page can distort the arc's shape dynamically.
+  function radialGradient(stops, shiftStart, shiftEnd, progress, origin, extraShift, sizeW, sizeH) {
     extraShift = extraShift || 0;
+    const w = sizeW || 150;
+    const h = sizeH || 100;
     const gradientStops = stops.map((stop) => {
       const color = stop.color;
       const shiftAmount = shiftStart + (progress / 100) * (shiftEnd - shiftStart) + extraShift;
       const adjustedPercent = stop.percent + shiftAmount;
       return `rgb(${color[0]}, ${color[1]}, ${color[2]}) ${adjustedPercent}%`;
     });
-    return `radial-gradient(ellipse 150% 100% at ${origin || 'center bottom'}, ${gradientStops.join(', ')})`;
+    return `radial-gradient(ellipse ${w}% ${h}% at ${origin || 'center bottom'}, ${gradientStops.join(', ')})`;
   }
 
   // Real-time audio amplitude reader for music-reactive effects. Returns

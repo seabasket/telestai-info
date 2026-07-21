@@ -9,7 +9,45 @@ head_scripts:
 <style>
   /* Page-specific overrides on top of assets/css/event.css */
   body {
-    background-color: rgb(165, 215, 245);
+    /* Starts black; the sky reveals over it on first play. */
+    background-color: #000000;
+  }
+
+  /* The animated sky lives on this layer (not the body) so it can be revealed
+     with an expanding circle from the center on first play. */
+  #sky {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    clip-path: circle(0% at 50% 50%);
+    transition: clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  #sky.revealed {
+    clip-path: circle(150% at 50% 50%);
+  }
+
+  /* "press me ->" prompt sitting just left of the centered play button. */
+  #press-me {
+    position: fixed;
+    top: 50%;
+    right: calc(50% + 118px);
+    transform: translateY(-50%);
+    z-index: 60;
+    color: #f5e6c8;
+    font-family: 'Lucida Console', monospace;
+    font-size: clamp(0.55rem, 2.2vw, 0.8rem);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+    transition: opacity 0.4s ease-out;
+  }
+  #press-me .arrow {
+    animation: arrowBlink 1.4s step-end infinite;
+  }
+  @keyframes arrowBlink {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
   }
 
   .text-container {
@@ -38,6 +76,7 @@ head_scripts:
   #stars {
     opacity: 0;
     transition: opacity 2s ease-out;
+    z-index: 1;
   }
 
   .home-button {
@@ -45,6 +84,10 @@ head_scripts:
     padding: 5px 10px;
   }
 </style>
+
+<div id="sky"></div>
+
+<div id="press-me">press me &mdash;<span class="arrow">&gt;</span></div>
 
 <div id="stars"></div>
 
@@ -118,9 +161,18 @@ const SKY_CONFIG = {
   starsFull: 80      // point in the sunset when stars reach full brightness
 };
 
+// Organic distortion of the gradient arc so it isn't a static perfect ellipse.
+const SHAPE_CONFIG = {
+  driftAmount: 14,   // % the arc's size/center wanders on its own (organic irregularity, not beat-locked)
+  driftSpeed: 0.15,  // how fast that wandering moves
+  beatBulge: 16      // % the arc stretches/bulges on the beat (0 = shape ignores the music)
+};
+
 const audioPlayer = document.querySelector('.audio-player');
 const audioElement = document.querySelector('audio');
 const starsContainer = document.getElementById('stars');
+const skyEl = document.getElementById('sky');
+const pressMe = document.getElementById('press-me');
 // No "SET RECORDING" button on this page (the set hasn't happened yet) --
 // event-engine.js's wire() still expects an element to toggle a class on,
 // so we hand it a detached element that's never inserted into the DOM.
@@ -138,11 +190,15 @@ const typewriter = TelestaiEvent.createTypewriter(audioElement);
 const pulse = TelestaiEvent.createPulse(audioElement, { smoothing: PULSE_CONFIG.smoothing });
 
 function litColors(brightnessFactor) {
-  return sunsetColors.map(function (stop) {
+  // The first (clear day-blue) and last (deep night) stops are immune to the
+  // pulse -- only the vibrant middle sunset bands brighten with the beat.
+  const last = sunsetColors.length - 1;
+  return sunsetColors.map(function (stop, i) {
+    const factor = (i === 0 || i === last) ? 1 : brightnessFactor;
     return {
       percent: stop.percent,
       color: stop.color.map(function (c) {
-        return Math.min(255, Math.round(c * brightnessFactor));
+        return Math.min(255, Math.round(c * factor));
       })
     };
   });
@@ -158,8 +214,21 @@ function applyFrame(progress, level) {
     level * (PULSE_CONFIG.brightness.max - PULSE_CONFIG.brightness.min);
   const wobble = (level - 0.5) * 2 * PULSE_CONFIG.gradientWobble.maxPercent;
 
-  document.body.style.background = TelestaiEvent.radialGradient(
-    litColors(brightnessFactor), SKY_CONFIG.startShift, SKY_CONFIG.endShift, sunsetProgress, 'center bottom', wobble
+  // Give the arc a living, irregular shape: a few out-of-phase oscillators
+  // wander its size + horizontal center (organic, not beat-locked), and the
+  // beat bulges/stretches it on top.
+  const t = performance.now() / 1000 * SHAPE_CONFIG.driftSpeed;
+  const driftX = (Math.sin(t) + Math.sin(t * 0.37 + 1.3) * 0.5) * SHAPE_CONFIG.driftAmount;
+  const driftW = Math.sin(t * 0.8 + 2.0) * SHAPE_CONFIG.driftAmount;
+  const driftH = Math.sin(t * 1.3 + 0.7) * SHAPE_CONFIG.driftAmount * 0.6;
+  const bulge = level * SHAPE_CONFIG.beatBulge;
+  const originX = 50 + driftX;
+  const sizeW = 150 + driftW + bulge;
+  const sizeH = 100 + driftH + bulge * 0.6;
+
+  skyEl.style.background = TelestaiEvent.radialGradient(
+    litColors(brightnessFactor), SKY_CONFIG.startShift, SKY_CONFIG.endShift,
+    sunsetProgress, originX + '% bottom', wobble, sizeW, sizeH
   );
 
   // Stars fade in during the later part of the sunset (none during the day)
@@ -174,8 +243,18 @@ function applyFrame(progress, level) {
   });
 }
 
-// Set initial daylight sky immediately on page load (progress 0, no pulse yet).
+// Paint the initial daylight sky onto the (still-hidden) #sky layer so it's
+// ready to be revealed on first play. Until then the black body shows through.
 applyFrame(0, 0);
+
+// First play: reveal the light-blue sky radially from the center over the
+// black intro, and dismiss the "press me" prompt. The rest of the animation
+// (driven by wire() below) then continues as normal.
+audioElement.addEventListener('play', function () {
+  skyEl.classList.add('revealed');
+  pressMe.style.opacity = '0';
+  setTimeout(function () { pressMe.style.display = 'none'; }, 400);
+}, { once: true });
 
 // The sky holds a clear light-blue day for the first SKY_CONFIG.sunsetStart%
 // of the track, then the sunset runs over the remainder: the gradient shifts
