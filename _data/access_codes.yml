@@ -1,9 +1,14 @@
 # Single source of truth for access-code pages.
 #
 # The code a visitor types on index.html IS the page's filename stem, and it
-# is checked against the SHA-256 hashes below (see index.html). To add a page:
+# is checked against the SHA-256 hashes below (see index.html) -- but the
+# hash is of the *suffix only*: everything after the first "-" (or the whole
+# slug if it has no dash). This is what makes codes prefix- and
+# case-agnostic: "ts-snst809", "TS-SNST809", and bare "snst809" all match.
+# To add a page:
 #   1. create <slug>.html at the repo root (front matter: layout: default or event)
-#   2. get the hash:  printf '%s' "your-slug" | shasum -a 256
+#   2. get the hash of the part after the dash (or the whole slug if there's
+#      no dash):  printf '%s' "your-suffix" | shasum -a 256
 #   3. add an entry here with that hash
 #
 # A future backend/dashboard can read or write this same file as the canonical
@@ -11,11 +16,11 @@
 - slug: ts-0001
   file: ts-0001.html
   title: "WINTER-PICNIC-SUNSET-SET"
-  sha256: "42e47f2fe6b7d410f0a5991928f14ca370d22656ce1a6990dbb23f3f86001e98"
+  sha256: "888b19a43b151683c87895f6211d9f8640f97bdc8ef32f03dbe057c8f5e56d32"
 - slug: ts-snri314
   file: ts-snri314.html
   title: "TS-SNRI314"
-  sha256: "7e9d4370f98d07993360bd4758d90695bb55643f814b714c1075cdec92d6bf10"
+  sha256: "d4536be8c27e3275d4301c465a412fff7a95b66c88d785b8877ddaeee7a4871a"
 - slug: about
   file: about.html
   title: "about"
@@ -23,8 +28,8 @@
 - slug: ts-mikel
   file: ts-mikel.html
   title: "Mike L's music reqs"
-  sha256: "6a3b64770be1d514f19722df69c5d0ad0c225d4bd797811ea598fe95882e0745"
+  sha256: "acf98536fe13b57c7aea2991da96e9bb5855cae7a46e19dadf071364376d044a"
 - slug: ts-snst809
   file: ts-snst809.html
   title: "TS-SNST809"
-  sha256: "9c0af887e3228f4a21bd9ed8fb650a810ffeaa59dc6950b489c93143c4332b3d"
+  sha256: "638a685e9f9081798afbcb4645b21b6a02bc9cc7bd71de72566e4ab8b51d5d48"

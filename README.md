@@ -14,7 +14,7 @@ GitHub Pages by `.github/workflows/jekyll-gh-pages.yml`.
 - `_includes/` — reusable bits: `page-overlay`, `home-button`, `set-recording-button`
 - `_data/access_codes.yml` — the list of access codes + their SHA-256 hashes
 - `assets/css/event.css`, `assets/js/event-engine.js` — shared styles/engine for the
-  audio-synced event pages (ts-0001, ts-snri314)
+  audio-synced event pages (ts-0001, ts-snri314, ts-snst809)
 - `assets/audio/`, `assets/img/` — page media
 
 ## adding a new access-code page
@@ -32,12 +32,14 @@ GitHub Pages by `.github/workflows/jekyll-gh-pages.yml`.
    head_scripts:
      - /assets/js/event-engine.js
    ```
-2. Get the code's hash:
+2. Get the hash of the code's suffix — the part after the first `-` (or
+   the whole code if it has no dash), since the prefix is disregarded when
+   checking codes:
    ```
-   printf '%s' "your-code" | shasum -a 256
+   printf '%s' "your-suffix" | shasum -a 256
    ```
 3. Add an entry to `_data/access_codes.yml` with that hash. `index.html` builds
-   its `KNOWN_HASHES` allowlist from this file automatically.
+   its `CODE_LOOKUP` map from this file automatically.
 
 ## local preview
 

@@ -12,9 +12,11 @@ AI-agent-authored branches and commits.
 The site's core mechanic is an access-code-gated landing page: a visitor
 types a code into a retro-terminal UI on `index.html`, the code is hashed
 (SHA-256) and checked against a known list, and on a match the browser
-redirects to `<code>.html`. Content pages include audio-synced "event" pages
-(starfield/typewriter effects synced to music) and small one-off personal
-pages.
+redirects to `<code>.html`. Codes are prefix- and case-agnostic (see
+Access-code / security model below), and the page shows a small corner
+dropdown of the visitor's previously-unlocked pages plus a `used/total`
+counter. Content pages include audio-synced "event" pages (starfield/
+typewriter effects synced to music) and small one-off personal pages.
 
 ## Tech stack
 
@@ -40,7 +42,7 @@ _data/
   access_codes.yml            # SINGLE SOURCE OF TRUTH for valid access codes (slug/file/title/sha256)
 assets/
   css/event.css                # shared styles for audio-synced event pages
-  js/event-engine.js           # shared JS engine (stars/typewriter/gradient/audio wiring)
+  js/event-engine.js           # shared JS engine (stars/typewriter/gradient/pulse/audio wiring)
   audio/, img/                 # page media
 index.html                   # terminal landing page + access-code checker
 about.html, ts-*.html        # access-code content pages (root-level, one per code)
@@ -89,17 +91,20 @@ and the `npm start` live-reload helper.
    head_scripts:
      - /assets/js/event-engine.js
    ```
-2. Compute the code's hash:
+2. Compute the hash of the code's **suffix** — the part after the first
+   `-` (or the whole slug if it has no dash), since the prefix is ignored
+   at check time (see below):
    ```
-   printf '%s' "your-code" | shasum -a 256
+   printf '%s' "your-suffix" | shasum -a 256
    ```
 3. Add an entry to `_data/access_codes.yml` (`slug`, `file`, `title`,
-   `sha256`). `index.html` builds its `KNOWN_HASHES` allowlist from this
-   file via a Liquid loop at build time — this file and the actual
+   `sha256`). `index.html` builds its `CODE_LOOKUP` (hash → slug) map from
+   this file via a Liquid loop at build time — this file and the actual
    root-level `.html` files must stay in sync.
 
-Access-code slugs are validated client-side against `^[a-z]{2}-[a-z0-9]{3,8}$`
-(e.g. `ts-0001`), except for a couple of legacy exceptions like `about`.
+Access-code slugs are validated client-side against
+`^([a-z]{2,}-)?[a-z0-9]{3,8}$` (e.g. `ts-0001`) purely to pick the right
+"not found" hint message — matching itself is prefix-agnostic (see below).
 
 ## Access-code / security model
 
@@ -111,9 +116,21 @@ hashes baked into the page from `_data/access_codes.yml`. Anyone who can
 view page source / the built `_site` can enumerate the hashes; treat these
 pages as unlisted, not private.
 
+Codes are **prefix- and case-agnostic**: input is lowercased, then
+everything before the first `-` is stripped before hashing (or the whole
+input is used if there's no `-`). So `ts-snst809`, `TS-SNST809`, and bare
+`snst809` all resolve to the same page. This means the hashes in
+`_data/access_codes.yml` are hashes of that suffix, not the full slug —
+see "Adding a new access-code page" above. On a match, `index.html` looks
+up the canonical slug from `CODE_LOOKUP` (not the raw input) to build the
+redirect target and the history entry, since the raw input may not be a
+valid filename stem on its own.
+
 Client-side state used by the gate:
 - Cookie `correctHistory` (365-day expiry) — remembers previously-entered
-  valid codes.
+  valid codes (by canonical slug), and drives both the corner "accessed"
+  dropdown (click an entry to jump to that page) and the `used/total`
+  counter at the bottom of the terminal box.
 - `sessionStorage` key `phraseIndex` — resumes the terminal's typewriter
   animation position across in-site navigation.
 
@@ -141,8 +158,8 @@ commit history, is a manual/agent-driven smoke test after changes:
 
 - `jekyll build` succeeds.
 - All pages render without errors.
-- `KNOWN_HASHES` in the built `index.html` matches the number of entries in
-  `_data/access_codes.yml`.
+- `CODE_LOOKUP` in the built `index.html` has one entry per row in
+  `_data/access_codes.yml`, and `TOTAL_CODES` matches that count.
 - The shared event engine loads and runs without JS console errors on
   event pages.
 - Asset paths (CSS/JS/audio/img) resolve correctly.
