@@ -413,7 +413,7 @@ function renderHistoryUI() {
       item.type = "button";
       item.className = "history-item";
       item.textContent = slug.toUpperCase();
-      item.onclick = () => { location.href = slug + ".html"; };
+      item.onclick = () => { location.href = "/" + slug + "/"; };
       list.appendChild(item);
     });
   } else {
@@ -482,9 +482,9 @@ async function check() {
     accessTypewriter.style.opacity = '0';
   }, 1300);
 
-  // Redirect
+  // Redirect (pretty permalink: /<slug>/ , not <slug>.html)
   setTimeout(() => {
-    location.href = slug + ".html";
+    location.href = "/" + slug + "/";
   }, 2000);
 }
 

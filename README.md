@@ -19,10 +19,12 @@ GitHub Pages by `.github/workflows/jekyll-gh-pages.yml`.
 
 ## adding a new access-code page
 
-1. Create `<code>.html` at the repo root. Start it with front matter:
+1. Create `<code>.html` at the repo root. Start it with front matter (the
+   `permalink` gives it a clean `/<code>/` URL — no `.html`):
    ```
    ---
    layout: default
+   permalink: /<code>/
    ---
    ```
    For an audio/event page, copy `ts-0001.html` and also add:

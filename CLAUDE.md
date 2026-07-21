@@ -12,7 +12,8 @@ AI-agent-authored branches and commits.
 The site's core mechanic is an access-code-gated landing page: a visitor
 types a code into a retro-terminal UI on `index.html`, the code is hashed
 (SHA-256) and checked against a known list, and on a match the browser
-redirects to `<code>.html`. Codes are prefix- and case-agnostic (see
+redirects to `/<code>/` (clean URL — see Pretty permalinks below). Codes
+are prefix- and case-agnostic (see
 Access-code / security model below), and the page shows a small corner
 dropdown of the visitor's previously-unlocked pages plus a `used/total`
 counter. Content pages include audio-synced "event" pages (starfield/
@@ -50,10 +51,27 @@ about.html, ts-*.html        # access-code content pages (root-level, one per co
   jekyll-gh-pages.yml          # build + deploy to GitHub Pages on push to main
 ```
 
-**Every content page is a flat root-level `.html` file** — this is
-deliberate, not an oversight. `index.html` redirects with
-`location.href = code + ".html"`, so a page's filename stem must equal its
-access-code slug. Don't move pages into subdirectories.
+**Every content page is a flat root-level `.html` source file** — this is
+deliberate, not an oversight. Each carries a `permalink: /<slug>/` in its
+front matter so Jekyll builds it to `<slug>/index.html` and it's served at
+the clean URL `/<slug>/` (no `.html`). `index.html` redirects with
+`location.href = "/" + slug + "/"`, and the source filename stem must still
+equal the access-code slug. Keep the source files flat at the repo root
+(the `permalink` handles the pretty output path); don't nest the sources
+in subdirectories.
+
+### Pretty permalinks / clean URLs
+
+Pages are served at `/<slug>/` (e.g. `/ts-snst809/`), not `/<slug>.html`.
+This is opt-in per page via a `permalink: /<slug>/` front-matter line —
+there is no site-wide permalink default (that would send `index.html` to
+`/index/`). GitHub Pages serves `/<slug>/` from the generated
+`<slug>/index.html` and 301-redirects the bare `/<slug>` (no trailing
+slash) to `/<slug>/`. Because pages now live one path segment deep, all
+internal links use root-absolute paths: the shared `home-button.html`
+points at `/`, asset references use `/assets/...` (via `relative_url`), and
+`index.html`'s redirect/dropdown build `"/" + slug + "/"`. Old `<slug>.html`
+URLs 404 after this change (there are no redirect stubs).
 
 `_layouts` and `_includes` are excluded from the built site automatically by
 Jekyll; `_config.yml`'s `exclude:` list additionally keeps `README.md`,
@@ -80,10 +98,12 @@ and the `npm start` live-reload helper.
 
 ## Adding a new access-code page
 
-1. Create `<code>.html` at the repo root, starting with front matter:
+1. Create `<code>.html` at the repo root, starting with front matter (the
+   `permalink` is what gives the page its clean `/<code>/` URL):
    ```yaml
    ---
    layout: default
+   permalink: /<code>/
    ---
    ```
    For an audio/event page, copy `ts-0001.html` as a starting point and also
@@ -126,8 +146,8 @@ input is used if there's no `-`). So `ts-snst809`, `TS-SNST809`, and bare
 `_data/access_codes.yml` are hashes of that suffix, not the full slug —
 see "Adding a new access-code page" above. On a match, `index.html` looks
 up the canonical slug from `CODE_LOOKUP` (not the raw input) to build the
-redirect target and the history entry, since the raw input may not be a
-valid filename stem on its own.
+redirect target (`/<slug>/`) and the history entry, since the raw input may
+not be a valid slug on its own.
 
 Client-side state used by the gate:
 - Cookie `correctHistory` (365-day expiry) — remembers previously-entered
