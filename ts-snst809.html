@@ -89,15 +89,15 @@ head_scripts:
 
 <script>
 // Sunset color progression (0-100%), reused from ts-snri314's sunrise palette.
-// Colors ordered from center-top outward:
-// 0% = center-top (near the anchor), 100% = outer edges / bottom of sky.
+// Colors ordered from center-bottom outward:
+// 0% = center-bottom horizon (near the anchor), 100% = outer edges / top of sky.
 const sunsetColors = [
-  { percent: 0,   color: [165, 215, 245] },  // clear day sky (center-top)
+  { percent: 0,   color: [165, 215, 245] },  // clear day sky (bottom horizon)
   { percent: 25,  color: [255, 180, 80] },   // golden horizon
   { percent: 45,  color: [255, 120, 30] },   // deep orange/fiery
   { percent: 62,  color: [200, 100, 140] },  // dusk rose/pink
   { percent: 80,  color: [45, 20, 75] },     // post-dusk indigo
-  { percent: 100, color: [8, 5, 25] }        // deep night (anchor for dark end)
+  { percent: 100, color: [8, 5, 25] }        // deep night (top of sky)
 ];
 
 // Clearly-named, adjustable parameters for the music-reactive pulse below.
@@ -106,7 +106,7 @@ const PULSE_CONFIG = {
   smoothing: 0.8,                       // 0-1, higher = smoother/slower-reacting
   brightness: { min: 0.85, max: 1.2 },  // gradient color multiplier range
   gradientWobble: { maxPercent: 4 },    // max +/- percent nudge to gradient position
-  starTwinkleSpeed: { min: 1.5, max: 4 } // seconds per twinkle cycle; lower = faster
+  starPulse: { rest: 0.35 }             // star brightness floor between beats (0-1); the beat lifts it toward full
 };
 
 const audioPlayer = document.querySelector('.audio-player');
@@ -118,6 +118,13 @@ const starsContainer = document.getElementById('stars');
 const setRecordingButton = document.createElement('div');
 
 const starElements = TelestaiEvent.createStars(starsContainer);
+// Drive star brightness from the beat instead of the shared CSS twinkle, and
+// give each star an intrinsic max brightness so the field isn't perfectly
+// uniform -- but they all rise and fall together on the beat.
+const starBright = starElements.map(function (star) {
+  star.style.animation = 'none';
+  return 0.6 + Math.random() * 0.4;
+});
 const typewriter = TelestaiEvent.createTypewriter(audioElement);
 const pulse = TelestaiEvent.createPulse(audioElement, { smoothing: PULSE_CONFIG.smoothing });
 
@@ -138,26 +145,28 @@ function applyFrame(progress, level) {
   const wobble = (level - 0.5) * 2 * PULSE_CONFIG.gradientWobble.maxPercent;
 
   document.body.style.background = TelestaiEvent.radialGradient(
-    litColors(brightnessFactor), 55, -100, progress, 'center top', wobble
+    litColors(brightnessFactor), 55, -100, progress, 'center bottom', wobble
   );
 
   // Stars fade in as the sun sets (invisible in daylight, visible by night)
   starsContainer.style.opacity = Math.min(1, Math.max(0, progress - 40) / 30);
 
-  const twinkleDuration = PULSE_CONFIG.starTwinkleSpeed.max -
-    level * (PULSE_CONFIG.starTwinkleSpeed.max - PULSE_CONFIG.starTwinkleSpeed.min);
-  starElements.forEach(function (star) {
-    star.style.animationDuration = twinkleDuration + 's';
+  // Most stars pulse together with the beat: brightness rises from the rest
+  // floor toward full as the live audio level spikes.
+  const starLevel = PULSE_CONFIG.starPulse.rest + level * (1 - PULSE_CONFIG.starPulse.rest);
+  starElements.forEach(function (star, i) {
+    star.style.opacity = Math.min(1, starBright[i] * starLevel);
   });
 }
 
 // Set initial daylight sky immediately on page load (progress 0, no pulse yet).
 applyFrame(0, 0);
 
-// Sunset gradient shifts +55% (daylight, sun near horizon) to -100% (fully
-// dark night), anchored at center-top so the color band sweeps downward from
-// the top of the screen as the sun sets. A live music pulse layers a subtle
-// brightness flicker + position wobble on top, and speeds up star twinkle.
+// Sunset gradient shifts +55% (daylight, warm glow at the bottom horizon) to
+// -100% (fully dark night), anchored at center-bottom so night falls in from
+// the TOP of the screen while the horizon stays lit longest. A live music
+// pulse layers a subtle brightness flicker + position wobble on the sky, and
+// pulses the stars together on the beat.
 TelestaiEvent.wire({
   audioElement: audioElement,
   audioPlayer: audioPlayer,
