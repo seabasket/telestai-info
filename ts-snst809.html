@@ -109,6 +109,15 @@ const PULSE_CONFIG = {
   starPulse: { rest: 0.35 }             // star brightness floor between beats (0-1); the beat lifts it toward full
 };
 
+// Sunset timing / sky progression (independent of the music pulse above).
+const SKY_CONFIG = {
+  sunsetStart: 55,   // % of the track that stays full daytime before the sunset begins (higher = longer day)
+  startShift: 100,   // gradient position at the start; higher = more of the screen is clear light-blue day
+  endShift: -100,    // gradient position at full night
+  starsStart: 45,    // point in the sunset (0-100, measured after the day hold) when stars begin to appear
+  starsFull: 80      // point in the sunset when stars reach full brightness
+};
+
 const audioPlayer = document.querySelector('.audio-player');
 const audioElement = document.querySelector('audio');
 const starsContainer = document.getElementById('stars');
@@ -140,16 +149,22 @@ function litColors(brightnessFactor) {
 }
 
 function applyFrame(progress, level) {
+  // Hold full daytime until sunsetStart% of the track, then run the whole
+  // sunset over the remainder. sunsetProgress: 0 = full day, 100 = full night.
+  const span = Math.max(1, 100 - SKY_CONFIG.sunsetStart);
+  const sunsetProgress = Math.min(100, Math.max(0, (progress - SKY_CONFIG.sunsetStart) / span * 100));
+
   const brightnessFactor = PULSE_CONFIG.brightness.min +
     level * (PULSE_CONFIG.brightness.max - PULSE_CONFIG.brightness.min);
   const wobble = (level - 0.5) * 2 * PULSE_CONFIG.gradientWobble.maxPercent;
 
   document.body.style.background = TelestaiEvent.radialGradient(
-    litColors(brightnessFactor), 55, -100, progress, 'center bottom', wobble
+    litColors(brightnessFactor), SKY_CONFIG.startShift, SKY_CONFIG.endShift, sunsetProgress, 'center bottom', wobble
   );
 
-  // Stars fade in as the sun sets (invisible in daylight, visible by night)
-  starsContainer.style.opacity = Math.min(1, Math.max(0, progress - 40) / 30);
+  // Stars fade in during the later part of the sunset (none during the day)
+  const starsSpan = Math.max(1, SKY_CONFIG.starsFull - SKY_CONFIG.starsStart);
+  starsContainer.style.opacity = Math.min(1, Math.max(0, (sunsetProgress - SKY_CONFIG.starsStart) / starsSpan));
 
   // Most stars pulse together with the beat: brightness rises from the rest
   // floor toward full as the live audio level spikes.
@@ -162,11 +177,12 @@ function applyFrame(progress, level) {
 // Set initial daylight sky immediately on page load (progress 0, no pulse yet).
 applyFrame(0, 0);
 
-// Sunset gradient shifts +55% (daylight, warm glow at the bottom horizon) to
-// -100% (fully dark night), anchored at center-bottom so night falls in from
-// the TOP of the screen while the horizon stays lit longest. A live music
-// pulse layers a subtle brightness flicker + position wobble on the sky, and
-// pulses the stars together on the beat.
+// The sky holds a clear light-blue day for the first SKY_CONFIG.sunsetStart%
+// of the track, then the sunset runs over the remainder: the gradient shifts
+// from startShift (day) to endShift (night), anchored at center-bottom so
+// night falls in from the TOP of the screen while the horizon stays lit
+// longest. A live music pulse layers a subtle brightness flicker + position
+// wobble on the sky, and pulses the stars together on the beat.
 TelestaiEvent.wire({
   audioElement: audioElement,
   audioPlayer: audioPlayer,
