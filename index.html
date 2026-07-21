@@ -426,15 +426,8 @@ function renderHistoryUI() {
 
 renderHistoryUI();
 
-// Auto-lowercase on input
-const codeInput = document.getElementById("code");
-codeInput.addEventListener('input', () => {
-  const pos = codeInput.selectionStart;
-  codeInput.value = codeInput.value.toLowerCase();
-  codeInput.setSelectionRange(pos, pos);
-});
-
-
+// The terminal shows exactly what the visitor types (any case); matching is
+// case-insensitive because check() lowercases the value before hashing.
 async function check() {
   const input = document.getElementById("code").value.toLowerCase().trim();
   // Everything before the first "-" is disregarded, so "ts-snst809",
