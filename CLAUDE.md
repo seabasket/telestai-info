@@ -57,7 +57,10 @@ access-code slug. Don't move pages into subdirectories.
 
 `_layouts` and `_includes` are excluded from the built site automatically by
 Jekyll; `_config.yml`'s `exclude:` list additionally keeps `README.md`,
-`package.json`, and Ruby/Node tooling files out of `_site`.
+`CLAUDE.md`, `package.json`, and Ruby/Node tooling files out of `_site`.
+(`CLAUDE.md` **must** stay excluded — it contains Liquid-tag-looking text in
+its prose that GitHub Pages' Jekyll would otherwise try to parse as real
+Liquid, failing the build.)
 
 ## Dev workflow
 

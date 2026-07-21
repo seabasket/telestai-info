@@ -6,6 +6,7 @@ description: "playground for web dev and using ai agents in coding"
 # by Jekyll's built-in defaults — these are the extra dev-only files.)
 exclude:
   - README.md
+  - CLAUDE.md
   - package.json
   - package-lock.json
   - node_modules
