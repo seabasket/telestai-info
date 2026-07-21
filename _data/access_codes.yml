@@ -24,3 +24,7 @@
   file: ts-mikel.html
   title: "Mike L's music reqs"
   sha256: "6a3b64770be1d514f19722df69c5d0ad0c225d4bd797811ea598fe95882e0745"
+- slug: ts-snst809
+  file: ts-snst809.html
+  title: "TS-SNST809"
+  sha256: "9c0af887e3228f4a21bd9ed8fb650a810ffeaa59dc6950b489c93143c4332b3d"

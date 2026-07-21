@@ -1,6 +1,6 @@
 /*
-  Shared styles for the audio-synced event pages (ts-0001, ts-snri314).
-  Only rules common to both live here; each page keeps its own inline <style>
+  Shared styles for the audio-synced event pages (ts-0001, ts-snri314, ts-snst809).
+  Only rules common to all three live here; each page keeps its own inline <style>
   for page-specific values (background-color, grid columns, font sizes,
   .home-button top/bottom, #stars opacity/transition, .audio-player.playing
   top %, and ts-snri314's #water/#sand).
@@ -80,8 +80,11 @@ audio {
   border-radius: 50px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  padding: 10px 20px;
+  padding: 4px 8px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-width: min(90vw, 280px);
+  transform: scale(0.85);
+  transform-origin: center;
 }
 
 audio::-webkit-media-controls-panel {

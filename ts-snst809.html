@@ -1,0 +1,170 @@
+---
+layout: default
+stylesheets:
+  - /assets/css/event.css
+head_scripts:
+  - /assets/js/event-engine.js
+---
+<style>
+  /* Page-specific overrides on top of assets/css/event.css */
+  body {
+    background-color: rgb(165, 215, 245);
+  }
+
+  .text-container {
+    grid-template-columns: 1fr 0.3fr 1fr;
+    font-size: clamp(0.4rem, 0.85vh, 0.75rem);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  }
+
+  .text-container .typewriter {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .audio-player.playing {
+    top: 95%;
+    transform: translate(-50%, -50%);
+  }
+
+  #stars {
+    opacity: 0;
+    transition: opacity 2s ease-out;
+  }
+
+  .home-button {
+    top: 20px;
+    padding: 5px 10px;
+  }
+</style>
+
+<div id="stars"></div>
+
+<div class="text-container">
+  <div class="typewriter" style="grid-area: header; justify-self: center; text-align: center;"><pre style="text-align: center;">{{ site.data.ts_snst809_text.header }}</pre></div>
+
+  <div class="typewriter" style="grid-area: d; text-align: left;"><pre>{{ site.data.ts_snst809_text.d }}</pre></div>
+
+  <div class="typewriter" style="grid-area: t; text-align: left;"><pre>{{ site.data.ts_snst809_text.t }}</pre></div>
+
+  <div class="typewriter" style="grid-area: l; text-align: right;"><pre>{{ site.data.ts_snst809_text.l }}</pre></div>
+
+  <div class="typewriter" style="grid-area: i; text-align: left;"><pre>{{ site.data.ts_snst809_text.i }}</pre></div>
+
+  <div class="typewriter" style="grid-area: music; text-align: center;">{{ site.data.ts_snst809_text.music }}</div>
+
+  <div class="typewriter" style="grid-area: and; text-align: center;">{{ site.data.ts_snst809_text.and }}</div>
+
+  <div class="typewriter" style="grid-area: picnic; text-align: center;">{{ site.data.ts_snst809_text.picnic }}</div>
+
+  <div style="grid-area: img; display: flex; align-items: center; justify-content: center;">
+    <img id="circleImage" src="" alt="" style="width: clamp(60px, 12vw, 120px); height: clamp(60px, 12vw, 120px); border-radius: 50%; object-fit: cover; opacity: 0; transition: opacity 0.5s ease-in;">
+  </div>
+
+  <div class="typewriter" style="grid-area: md; text-align: left;"><pre>{{ site.data.ts_snst809_text.md }}</pre></div>
+
+  <div class="typewriter" style="grid-area: pd; text-align: right;"><pre>{{ site.data.ts_snst809_text.pd }}</pre></div>
+
+  <div class="typewriter" style="grid-area: rules; text-align: left;"><pre>{{ site.data.ts_snst809_text.rules }}</pre></div>
+
+  <div class="typewriter" style="grid-area: signoff; text-align: left;"><pre>{{ site.data.ts_snst809_text.signoff }}</pre></div>
+</div>
+
+<div class="audio-player">
+  <audio controls>
+    <source src="{{ '/assets/audio/ts-snst809.mp3' | relative_url }}" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+</div>
+
+{% include home-button.html %}
+
+<script>
+// Sunset color progression (0-100%), reused from ts-snri314's sunrise palette.
+// Colors ordered from center-top outward:
+// 0% = center-top (near the anchor), 100% = outer edges / bottom of sky.
+const sunsetColors = [
+  { percent: 0,   color: [165, 215, 245] },  // clear day sky (center-top)
+  { percent: 25,  color: [255, 180, 80] },   // golden horizon
+  { percent: 45,  color: [255, 120, 30] },   // deep orange/fiery
+  { percent: 62,  color: [200, 100, 140] },  // dusk rose/pink
+  { percent: 80,  color: [45, 20, 75] },     // post-dusk indigo
+  { percent: 100, color: [8, 5, 25] }        // deep night (anchor for dark end)
+];
+
+// Clearly-named, adjustable parameters for the music-reactive pulse below.
+const PULSE_CONFIG = {
+  sensitivity: 1.0,                     // multiplier on the raw 0-1 pulse level
+  smoothing: 0.8,                       // 0-1, higher = smoother/slower-reacting
+  brightness: { min: 0.85, max: 1.2 },  // gradient color multiplier range
+  gradientWobble: { maxPercent: 4 },    // max +/- percent nudge to gradient position
+  starTwinkleSpeed: { min: 1.5, max: 4 } // seconds per twinkle cycle; lower = faster
+};
+
+const audioPlayer = document.querySelector('.audio-player');
+const audioElement = document.querySelector('audio');
+const starsContainer = document.getElementById('stars');
+// No "SET RECORDING" button on this page (the set hasn't happened yet) --
+// event-engine.js's wire() still expects an element to toggle a class on,
+// so we hand it a detached element that's never inserted into the DOM.
+const setRecordingButton = document.createElement('div');
+
+const starElements = TelestaiEvent.createStars(starsContainer);
+const typewriter = TelestaiEvent.createTypewriter(audioElement);
+const pulse = TelestaiEvent.createPulse(audioElement, { smoothing: PULSE_CONFIG.smoothing });
+
+function litColors(brightnessFactor) {
+  return sunsetColors.map(function (stop) {
+    return {
+      percent: stop.percent,
+      color: stop.color.map(function (c) {
+        return Math.min(255, Math.round(c * brightnessFactor));
+      })
+    };
+  });
+}
+
+function applyFrame(progress, level) {
+  const brightnessFactor = PULSE_CONFIG.brightness.min +
+    level * (PULSE_CONFIG.brightness.max - PULSE_CONFIG.brightness.min);
+  const wobble = (level - 0.5) * 2 * PULSE_CONFIG.gradientWobble.maxPercent;
+
+  document.body.style.background = TelestaiEvent.radialGradient(
+    litColors(brightnessFactor), 55, -100, progress, 'center top', wobble
+  );
+
+  // Stars fade in as the sun sets (invisible in daylight, visible by night)
+  starsContainer.style.opacity = Math.min(1, Math.max(0, progress - 40) / 30);
+
+  const twinkleDuration = PULSE_CONFIG.starTwinkleSpeed.max -
+    level * (PULSE_CONFIG.starTwinkleSpeed.max - PULSE_CONFIG.starTwinkleSpeed.min);
+  starElements.forEach(function (star) {
+    star.style.animationDuration = twinkleDuration + 's';
+  });
+}
+
+// Set initial daylight sky immediately on page load (progress 0, no pulse yet).
+applyFrame(0, 0);
+
+// Sunset gradient shifts +55% (daylight, sun near horizon) to -100% (fully
+// dark night), anchored at center-top so the color band sweeps downward from
+// the top of the screen as the sun sets. A live music pulse layers a subtle
+// brightness flicker + position wobble on top, and speeds up star twinkle.
+TelestaiEvent.wire({
+  audioElement: audioElement,
+  audioPlayer: audioPlayer,
+  setRecordingButton: setRecordingButton,
+  typewriter: typewriter,
+  onFrame: function (progress) {
+    const level = Math.min(1, pulse.getLevel() * PULSE_CONFIG.sensitivity);
+    applyFrame(progress, level);
+  }
+});
+</script>

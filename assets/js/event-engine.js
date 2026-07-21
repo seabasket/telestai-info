@@ -1,15 +1,18 @@
 /*
-  Shared engine for the audio-synced event pages (ts-0001, ts-snri314).
+  Shared engine for the audio-synced event pages (ts-0001, ts-snri314, ts-snst809).
   Defines window.TelestaiEvent; each page supplies its own colors, shift range,
-  and per-frame callback (stars/sand/water), then calls TelestaiEvent.wire(...).
+  and per-frame callback (stars/sand/water/pulse), then calls TelestaiEvent.wire(...).
+  createPulse() is opt-in (only ts-snst809 uses it so far).
 
   Loaded in <head> (via the page's `head_scripts` front matter) so these
   definitions exist before the page's own inline <script> runs.
 */
 window.TelestaiEvent = (function () {
-  // Generate twinkling stars inside the given container.
+  // Generate twinkling stars inside the given container. Returns the created
+  // elements so a page can later drive per-star properties (e.g. twinkle speed).
   function createStars(container, count) {
     count = count || 50;
+    const stars = [];
     for (let i = 0; i < count; i++) {
       const star = document.createElement('div');
       star.className = 'star';
@@ -17,20 +20,68 @@ window.TelestaiEvent = (function () {
       star.style.top = `${Math.random() * 100}%`;
       star.style.animationDelay = `${Math.random() * 3}s`;
       container.appendChild(star);
+      stars.push(star);
     }
+    return stars;
   }
 
   // Build the radial-gradient string for a given progress (0-100).
   // `stops` is [{ percent, color: [r,g,b] }, ...]; the whole gradient shifts
   // from `shiftStart`% (progress 0) to `shiftEnd`% (progress 100).
-  function radialGradient(stops, shiftStart, shiftEnd, progress) {
+  // `origin` is the CSS radial-gradient position (default 'center bottom').
+  // `extraShift` is an additional flat percent offset applied to every stop
+  // (default 0), for effects like a music-driven wobble layered on top.
+  function radialGradient(stops, shiftStart, shiftEnd, progress, origin, extraShift) {
+    extraShift = extraShift || 0;
     const gradientStops = stops.map((stop) => {
       const color = stop.color;
-      const shiftAmount = shiftStart + (progress / 100) * (shiftEnd - shiftStart);
+      const shiftAmount = shiftStart + (progress / 100) * (shiftEnd - shiftStart) + extraShift;
       const adjustedPercent = stop.percent + shiftAmount;
       return `rgb(${color[0]}, ${color[1]}, ${color[2]}) ${adjustedPercent}%`;
     });
-    return `radial-gradient(ellipse 150% 100% at center bottom, ${gradientStops.join(', ')})`;
+    return `radial-gradient(ellipse 150% 100% at ${origin || 'center bottom'}, ${gradientStops.join(', ')})`;
+  }
+
+  // Real-time audio amplitude reader for music-reactive effects. Returns
+  // { getLevel() } giving a smoothed 0-1 level. Opt-in per page; does nothing
+  // until the audio element starts playing (Web Audio requires a user gesture).
+  function createPulse(audioElement, options) {
+    options = options || {};
+    const smoothing = options.smoothing != null ? options.smoothing : 0.8;
+    let audioCtx = null;
+    let analyser = null;
+    let dataArray = null;
+    let ready = false;
+    let smoothedLevel = 0;
+
+    function init() {
+      if (ready) return;
+      ready = true;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContextClass();
+      const sourceNode = audioCtx.createMediaElementSource(audioElement);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+      sourceNode.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    }
+
+    // AudioContext creation must happen inside a user-gesture-gated handler.
+    audioElement.addEventListener('play', init, { once: true });
+
+    function getLevel() {
+      if (!ready || !analyser) return 0;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      analyser.getByteFrequencyData(dataArray);
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+      const rawLevel = (sum / dataArray.length) / 255;
+      smoothedLevel = smoothedLevel * smoothing + rawLevel * (1 - smoothing);
+      return smoothedLevel;
+    }
+
+    return { getLevel: getLevel };
   }
 
   // Typewriter synced to audio position. Reveals the grid-area blocks in order
@@ -176,6 +227,7 @@ window.TelestaiEvent = (function () {
     createStars: createStars,
     radialGradient: radialGradient,
     createTypewriter: createTypewriter,
+    createPulse: createPulse,
     wire: wire
   };
 })();

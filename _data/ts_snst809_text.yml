@@ -1,0 +1,88 @@
+# Editable text content for ts-snst809.html's typewriter sections.
+#
+# Each key below corresponds to one `grid-area` block on the page (see
+# ts-snst809.html), rendered into the same <pre>/text structure via Liquid.
+# The JS typewriter engine (assets/js/event-engine.js) reads whatever ends up
+# in the DOM after Jekyll renders this, so editing this file is all that's
+# needed to change the page's text -- no HTML/JS changes required.
+#
+# This is currently a straight duplicate of ts-snri314.html's placeholder
+# text; edit freely with the real TS-SNST809 details.
+header: |
+
+  |- - - - - TS-SNRI314 - - - - -|
+
+  --OPEN-INVITE!--
+d: |
+
+  ON
+  SATURDAY
+  MARCH FOURTEENTH
+      TWENTY TWENTY-SIX
+t: |
+
+  @
+  6:00 AM! (YES IN THE MORNING!!)
+  UNTIL
+  10:00 AM-ISH (ON BEACH TIIIME ;)
+l: |
+
+  @
+  HIGHTOWER BEACH
+  28°11'31.0"N 80°35'36.2"W
+  [DAY OF/DAY BEFORE UPDATES:
+  here and @telestai.info on IG]
+i: |
+
+  YOU ARE INVITED TO CELEBRATE
+      FOR NO PARTICULAR REASON
+        JUST BECAUSE WE CAN
+
+  WITH
+music: "MUSIC (PROVIDED)"
+and: "&"
+picnic: "A PICNIC (PROVIDED BY YOU)"
+md: |
+
+  THE MUSIC (WILL FOLLOW THE LIGHT)
+  think.....
+
+  - dark 5AM wubs/grooves
+  - dreamy, new trancy prog. house
+  - "2013 on the bus headphones in edm nostalgia" core
+  - jazzy stuff? reggae? we will seeeee
+  - "Drinking orange juice in the sand at 7:30AM with some new friends" core
+  - whatever else i feel like :)))
+
+  plus a @dj_rude_boy daytime set whatttt
+pd: |
+
+  ITS A BEACH PICNIC (SO DO AND BRING PICNIC STUFF)
+  think.....
+
+  journal/art supplies!!!
+  towel/blanket (beach)
+  change of swimsuit (beach)
+  surf/skimboard? (beach 3x)
+  food/breakfast (yum)
+  frisbee/ball/flow (yeah)
+  etc etc etc you get it
+rules: |
+
+  PLEASE ABIDE BY THE
+  RULES:
+  1. COME FOR THE MUSIC
+      AND BE OPEN TO UNFAMILIAR SOUNDS.
+  2. FACE ONE ANOTHER, NOT THE DJ.
+  3. GET TO KNOW SOMEONE YOU DONT YET.
+  4. BE PRESENT, NOT ONLINE.
+  5. PRACTICE PLUR.
+signoff: |
+
+  ⠀⠀⠀⠀⠀⠀⠀⠀⣠⣶⣶⣶⣦⠀⠀
+  ⠀⠀⣠⣤⣤⣄⣀⣾⣿⠟⠛⠻⢿⣷⠀
+  ⢰⣿⡿⠛⠙⠻⣿⣿⠁⠀⠀⠀⣶⢿⡇
+  ⢿⣿⣇   ⠈⠏see you soon <3
+  ⠻⣿⣷⣦⣤⣀⠀⠀⠀⠀⣾⡿⠃⠀
+  ⠀⠀⠀⠀⠉⠉⠻⣿⣄⣴⣿⠟⠀⠀⠀    -telestai
+  ⠀⠀⠀⠀⠀⠀⠀⣿⡿⠟⠁⠀⠀⠀⠀
