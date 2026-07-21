@@ -164,17 +164,6 @@ title: telestai.info
     overflow-wrap: break-word;
     word-break: break-word;
   }
-  #access-counter {
-    width: min(88vw, 420px);
-    text-align: left;
-    font-family: 'Lucida Console', monospace;
-    font-size: clamp(0.6rem, 2.2vw, 0.85rem);
-    color: #f5e6c8;
-    margin-top: 10px;
-  }
-  @media (min-width: 700px) {
-    #access-counter { width: min(90vw, 800px); }
-  }
   .history-dropdown {
     position: fixed;
     top: 14px;
@@ -204,6 +193,7 @@ title: telestai.info
     top: calc(100% + 6px);
     right: 0;
     min-width: 160px;
+    max-width: 240px;
     max-height: 40vh;
     overflow-y: auto;
     background: #000000;
@@ -213,6 +203,24 @@ title: telestai.info
   }
   .history-list.open {
     display: block;
+  }
+  .history-counter {
+    padding: 6px 8px 8px;
+    color: #6ab95c;
+    font-size: clamp(0.55rem, 1.8vw, 0.75rem);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(245, 230, 200, 0.25);
+    margin-bottom: 4px;
+    cursor: default;
+  }
+  .history-empty {
+    padding: 6px 8px;
+    color: #f5e6c8;
+    font-size: clamp(0.55rem, 1.8vw, 0.75rem);
+    letter-spacing: 0.3px;
+    line-height: 1.5;
+    cursor: default;
   }
   .history-item {
     display: block;
@@ -235,7 +243,7 @@ title: telestai.info
 </head>
 <body>
 
-<div class="history-dropdown" id="history-dropdown" style="display:none;">
+<div class="history-dropdown" id="history-dropdown">
   <button type="button" class="history-toggle" id="history-toggle" onclick="toggleHistoryList()">accessed ▾</button>
   <div class="history-list" id="history-list"></div>
 </div>
@@ -255,7 +263,6 @@ title: telestai.info
 </form>
 
 <div id="msg"></div>
-<div id="access-counter"></div>
 </div>
 
 <div id="access-typewriter"></div>
@@ -389,13 +396,16 @@ function toggleHistoryList() {
 }
 
 function renderHistoryUI() {
-  const dropdown = document.getElementById("history-dropdown");
   const list = document.getElementById("history-list");
-  const counter = document.getElementById("access-counter");
+  list.innerHTML = "";
 
   if (correctHistory.length) {
-    dropdown.style.display = "block";
-    list.innerHTML = "";
+    // Non-clickable counter at the top of the dropdown.
+    const counter = document.createElement("div");
+    counter.className = "history-counter";
+    counter.textContent = correctHistory.length + "/" + TOTAL_CODES + " pages accessed";
+    list.appendChild(counter);
+
     correctHistory.forEach((slug) => {
       const item = document.createElement("button");
       item.type = "button";
@@ -405,10 +415,11 @@ function renderHistoryUI() {
       list.appendChild(item);
     });
   } else {
-    dropdown.style.display = "none";
+    const empty = document.createElement("div");
+    empty.className = "history-empty";
+    empty.textContent = "You haven't accessed any pages yet. Find an access code and enter it into the terminal.";
+    list.appendChild(empty);
   }
-
-  counter.innerHTML = "<pre>" + correctHistory.length + "/" + TOTAL_CODES + " pages accessed</pre>";
 }
 
 renderHistoryUI();
