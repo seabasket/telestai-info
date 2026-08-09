@@ -112,6 +112,35 @@ title: telestai.info
   .submit-btn:hover, .submit-btn:active {
     opacity: 0.7;
   }
+  /*
+    Temporary urgent notice, rendered above the terminal only when
+    _includes/urgent-message.md has content in it. Width tracks
+    .terminal-row so it lines up with the terminal below it.
+  */
+  .urgent-box {
+    box-sizing: border-box;
+    width: min(88vw, 420px);
+    margin-bottom: 18px;
+    background: #000000;
+    border: 1px solid #ff5555;
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: #f5e6c8;
+    font-size: clamp(0.6rem, 2.2vw, 0.85rem);
+    line-height: 1.5;
+    text-align: center;
+    box-shadow: 0 0 24px rgba(0,0,0,0.6);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  @media (min-width: 700px) {
+    .urgent-box { width: min(90vw, 800px); }
+  }
+  /* markdownify wraps the message in <p> -- keep it tight in the layout. */
+  .urgent-box p { margin: 0; }
+  .urgent-box p + p { margin-top: 8px; }
+  .urgent-box a { color: #6ab95c; }
+  .urgent-box strong { color: #ff5555; }
   .box {
     display: flex;
     flex-direction: column;
@@ -249,6 +278,18 @@ title: telestai.info
   <button type="button" class="history-toggle" id="history-toggle" onclick="toggleHistoryList()">accessed ▾</button>
   <div class="history-list" id="history-list"></div>
 </div>
+
+{%- comment -%}
+  Temporary urgent message. Content lives in _includes/urgent-message.md --
+  empty file (or whitespace only) means no box is rendered at all.
+{%- endcomment -%}
+{%- capture urgent_message_raw -%}{% include urgent-message.md %}{%- endcapture -%}
+{%- assign urgent_message = urgent_message_raw | strip -%}
+{%- if urgent_message != "" %}
+<div class="urgent-box">
+  {{ urgent_message | markdownify }}
+</div>
+{%- endif %}
 
 <div class="box">
 
