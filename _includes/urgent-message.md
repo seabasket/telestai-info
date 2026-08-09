@@ -9,3 +9,8 @@
   This whole comment block is stripped by Liquid before the emptiness check
   runs, so it does not count as content -- it's safe to leave it here.
 {%- endcomment -%}
+
+ALERT
+
+TS-SNST809 gettin scooted to start at 5:15 to dodge the rain. 
+seeya there!  <3
