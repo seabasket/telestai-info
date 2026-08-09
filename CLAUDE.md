@@ -41,6 +41,7 @@ _includes/
   set-recording-button.html   # "SET RECORDING" link (event pages)
 _data/
   access_codes.yml            # SINGLE SOURCE OF TRUTH for valid access codes (slug/file/title/sha256)
+  phrases/                    # homepage scrolling-text sets (index.html picks one at random per page load)
 assets/
   css/event.css                # shared styles for audio-synced event pages
   js/event-engine.js           # shared JS engine (stars/typewriter/gradient/pulse/audio wiring)
@@ -129,6 +130,24 @@ Access-code slugs are validated client-side against
 `^([a-z]{2,}-)?[a-z0-9]{3,8}$` (e.g. `ts-0001`) purely to pick the right
 "not found" hint message — matching itself is prefix-agnostic (see below).
 
+## Editing the homepage scrolling text
+
+The lines that type themselves out above the terminal input on `index.html`
+live in `_data/phrases/*.yml`, not inline in the page. Each file is a plain
+YAML list of strings (one line of scrolling text per list item) and is one
+randomly-selectable "set" — `index.html` builds a `PHRASE_SETS` JS object
+from every file in that folder via a Liquid loop at build time, then picks
+one set at random client-side each time the homepage loads (persisted to
+`sessionStorage` for the rest of that tab session, so navigating to a
+content page and back doesn't switch sets mid-loop).
+
+- **To edit the existing text**: just edit the strings in
+  `_data/phrases/default.yml` (or whichever file). No HTML/JS changes
+  needed.
+- **To add another randomly-selectable set**: drop a new `.yml` file into
+  `_data/phrases/` with the same plain-list format — it's picked up
+  automatically.
+
 ## Access-code / security model
 
 The access-code gate is **client-side obscurity, not real authentication**.
@@ -156,6 +175,10 @@ Client-side state used by the gate:
   counter at the bottom of the terminal box.
 - `sessionStorage` key `phraseIndex` — resumes the terminal's typewriter
   animation position across in-site navigation.
+- `sessionStorage` key `phraseSetKey` — remembers which randomly-picked
+  `_data/phrases/*.yml` set (see "Editing the homepage scrolling text"
+  above) this tab session is using, so it stays consistent across in-site
+  navigation instead of re-rolling on every page load.
 
 ## Conventions
 
