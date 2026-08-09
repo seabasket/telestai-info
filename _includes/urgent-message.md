@@ -10,7 +10,8 @@
   runs, so it does not count as content -- it's safe to leave it here.
 {%- endcomment -%}
 
-ALERT
+#ALERT
 
-TS-SNST809 gettin scooted to start at 5:15 to dodge the rain. 
+[3:28PM]
+TS-SNST809's gettin scooted to start at 5:15PM to dodge the rain. 
 seeya there!  <3
