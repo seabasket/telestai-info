@@ -281,14 +281,54 @@ title: telestai.info
 
 {%- comment -%}
   Temporary urgent message. Content lives in _includes/urgent-message.md --
-  empty file (or whitespace only) means no box is rendered at all.
+  empty file (or whitespace only) means no box is rendered at all. An
+  optional first line "EXPIRES: MM/DD/YYYY HH:MM" auto-hides the box, live
+  in the visitor's browser, once that moment passes -- see that file's
+  header comment for details.
 {%- endcomment -%}
+{%- comment -%} Liquid string literals don't support "\n" as an escape -- capture
+  a real newline character to split/join on. {%- endcomment -%}
+{%- capture newline %}
+{% endcapture -%}
 {%- capture urgent_message_raw -%}{% include urgent-message.md %}{%- endcapture -%}
-{%- assign urgent_message = urgent_message_raw | strip -%}
-{%- if urgent_message != "" %}
-<div class="urgent-box">
-  {{ urgent_message | markdownify }}
+{%- assign urgent_lines = urgent_message_raw | split: newline -%}
+{%- assign urgent_first_line = urgent_lines[0] | default: "" | strip -%}
+{%- assign urgent_prefix = urgent_first_line | slice: 0, 8 -%}
+{%- assign urgent_expires = "" -%}
+{%- assign urgent_body = "" -%}
+{%- if urgent_prefix == "EXPIRES:" -%}
+  {%- assign urgent_expires = urgent_first_line | remove_first: "EXPIRES:" | strip -%}
+{%- endif -%}
+{%- for line in urgent_lines -%}
+  {%- unless forloop.first and urgent_expires != "" -%}
+    {%- assign urgent_body = urgent_body | append: line | append: newline -%}
+  {%- endunless -%}
+{%- endfor -%}
+{%- assign urgent_body = urgent_body | strip -%}
+{%- if urgent_body != "" %}
+<div class="urgent-box" id="urgent-box"{% if urgent_expires != "" %} data-expires="{{ urgent_expires }}"{% endif %}>
+  {{ urgent_body | markdownify }}
 </div>
+<script>
+(function () {
+  var box = document.getElementById('urgent-box');
+  var expiresStr = box.getAttribute('data-expires');
+  if (!expiresStr) return;
+  var m = expiresStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/);
+  if (!m) return; // unparseable -> fail open, leave the alert showing
+  var expiresAt = new Date(+m[3], +m[1] - 1, +m[2], +m[4], +m[5]).getTime();
+  if (isNaN(expiresAt)) return;
+  var intervalId;
+  function checkExpiry() {
+    if (Date.now() >= expiresAt) {
+      box.style.display = 'none';
+      clearInterval(intervalId);
+    }
+  }
+  checkExpiry();
+  intervalId = setInterval(checkExpiry, 30000);
+})();
+</script>
 {%- endif %}
 
 <div class="box">
