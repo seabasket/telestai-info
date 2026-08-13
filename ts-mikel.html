@@ -16,14 +16,14 @@ permalink: /ts-mikel/
   body {
     margin: 0;
     min-height: 100vh;
-    font-family: 'Lucida Console', monospace;
-    color: #ffffff;
+    font-family: var(--ts-font-mono);
+    color: var(--ts-white);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background: linear-gradient(to bottom, #EB2627, #1434A4);
-    letter-spacing: 0.3px;
+    letter-spacing: var(--ts-letter-spacing);
   }
 
   .label {
@@ -41,11 +41,11 @@ permalink: /ts-mikel/
   }
 
   .req-btn {
-    font-family: 'Lucida Console', monospace;
+    font-family: var(--ts-font-mono);
     font-size: clamp(0.45rem, 1.2vh, 0.75rem);
-    letter-spacing: 0.3px;
+    letter-spacing: var(--ts-letter-spacing);
     background: rgba(0, 0, 0, 0.3);
-    color: #ffffff;
+    color: var(--ts-white);
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 8px;
     padding: 8px 20px;
@@ -68,13 +68,13 @@ permalink: /ts-mikel/
     left: 20px;
     padding: 5px 10px;
     background: rgba(0, 0, 0, 0.3);
-    color: #ffffff;
+    color: var(--ts-white);
     text-decoration: none;
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
-    font-family: 'Lucida Console', monospace;
+    font-family: var(--ts-font-mono);
     font-size: clamp(0.45rem, 1vh, 0.85rem);
-    letter-spacing: 0.3px;
+    letter-spacing: var(--ts-letter-spacing);
     z-index: 1000;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;

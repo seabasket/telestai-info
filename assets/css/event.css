@@ -20,8 +20,8 @@ html {
 body {
   margin: 0;
   height: 100vh;
-  font-family: 'Lucida Console', monospace;
-  color: #ffffff;
+  font-family: var(--ts-font-mono);
+  color: var(--ts-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -54,7 +54,7 @@ body {
   gap: clamp(3px, 0.8vh, 10px);
   align-items: start;
   text-align: center;
-  letter-spacing: 0.3px;
+  letter-spacing: var(--ts-letter-spacing);
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   opacity: 1;
   overflow: hidden;
@@ -123,13 +123,13 @@ pre {
   position: fixed;
   left: 20px;
   background: rgba(0, 0, 0, 0.3);
-  color: #ffffff;
+  color: var(--ts-white);
   text-decoration: none;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  font-family: 'Lucida Console', monospace;
+  font-family: var(--ts-font-mono);
   font-size: clamp(0.45rem, 1vh, 0.85rem);
-  letter-spacing: 0.3px;
+  letter-spacing: var(--ts-letter-spacing);
   z-index: 1000;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
@@ -147,13 +147,13 @@ pre {
   transform: translateX(-50%);
   padding: 10px 20px;
   background: rgba(0, 0, 0, 0.3);
-  color: #ffffff;
+  color: var(--ts-white);
   text-decoration: none;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  font-family: 'Lucida Console', monospace;
+  font-family: var(--ts-font-mono);
   font-size: clamp(0.45rem, 1vh, 0.85rem);
-  letter-spacing: 0.3px;
+  letter-spacing: var(--ts-letter-spacing);
   z-index: 1000;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;

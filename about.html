@@ -9,15 +9,15 @@ overlay_transition: "1000ms ease-out"
   body {
     margin: 0;
     height: 100vh;
-    background: #230e02;
-    color: #f5e6c8;
-    font-family: 'Lucida Console', monospace;
+    background: var(--ts-brown);
+    color: var(--ts-cream);
+    font-family: var(--ts-font-mono);
     font-size: clamp(0.45rem, 1vh, 0.85rem);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    letter-spacing: 0.3px;
+    letter-spacing: var(--ts-letter-spacing);
     overflow: hidden;
     touch-action: none;
     position: fixed;
@@ -46,17 +46,17 @@ overlay_transition: "1000ms ease-out"
     display: inline-block;
     margin-top: 30px;
     padding: 6px 14px;
-    background: #000000;
-    color: #ffffff;
+    background: var(--ts-black);
+    color: var(--ts-white);
     text-decoration: none;
-    border: 1px solid #ffffff;
+    border: 1px solid var(--ts-white);
     border-radius: 8px;
-    font-family: 'Lucida Console', monospace;
+    font-family: var(--ts-font-mono);
     font-size: inherit;
     cursor: pointer;
   }
   a.home-button:hover {
-    background: #003366;
+    background: var(--ts-hover-navy);
   }
 </style>
 <div class="box">

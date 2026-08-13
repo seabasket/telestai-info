@@ -2,7 +2,7 @@
 Fade-from-black page transition. Pass transition="1000ms ease-out" to override
 the default 0.5s duration (about.html uses the slower one).
 {%- endcomment -%}
-<div id="page-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000000;z-index:9999;pointer-events:none;opacity:1;transition:opacity {{ include.transition | default: '0.5s ease-out' }};"></div>
+<div id="page-overlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--ts-black);z-index:9999;pointer-events:none;opacity:1;transition:opacity {{ include.transition | default: '0.5s ease-out' }};"></div>
 <script>
 requestAnimationFrame(() => requestAnimationFrame(() => {
   const overlay = document.getElementById('page-overlay');

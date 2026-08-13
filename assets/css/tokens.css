@@ -1,0 +1,33 @@
+/*
+  Design tokens for telestai.info. Single source of truth for the site's
+  palette and fonts -- everything else (event.css, essay.css, index.html's
+  and about.html's inline <style> blocks, etc.) should reference these
+  instead of repeating hex/font-family literals, so the whole site can be
+  restyled from this one file.
+
+  Loaded before every other stylesheet: via _layouts/default.html for
+  about.html, the ts-*.html pages, and ai.html, and directly in index.html's
+  <head> since that page builds its own <head> rather than going through
+  the default layout.
+
+  Deliberately NOT tokenized: one-off decorative colors used in exactly one
+  place (about.html's #88ccff ASCII-art text, ts-mikel.html's red/blue
+  gradient) and translucent rgba() overlays (home-button hover states,
+  box-shadows) -- those aren't part of the shared palette, just page-local
+  choices.
+*/
+:root {
+  /* palette -- see CLAUDE.md's "Conventions" section for the canonical names */
+  --ts-cream: #f5e6c8;       /* text/borders on dark backgrounds */
+  --ts-brown: #230e02;       /* page background (terminal pages) */
+  --ts-black: #000000;       /* terminal/panel background */
+  --ts-green: #6ab95c;       /* prompt, links, accents */
+  --ts-white: #ffffff;       /* text on the audio-synced event pages */
+  --ts-alert: #ff5555;       /* error/urgent state */
+  --ts-hover-navy: #003366;  /* home-button hover background */
+
+  /* type */
+  --ts-font-mono: 'Lucida Console', monospace;
+  --ts-font-serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  --ts-letter-spacing: 0.3px;
+}

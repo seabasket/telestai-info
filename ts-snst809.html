@@ -10,7 +10,7 @@ head_scripts:
   /* Page-specific overrides on top of assets/css/event.css */
   body {
     /* Starts black; the sky reveals over it on first play. */
-    background-color: #000000;
+    background-color: var(--ts-black);
   }
 
   /* The animated sky lives on this layer (not the body) so it can be revealed
@@ -35,10 +35,10 @@ head_scripts:
     right: calc(50% + 118px);
     transform: translateY(-50%);
     z-index: 60;
-    color: #f5e6c8;
-    font-family: 'Lucida Console', monospace;
+    color: var(--ts-cream);
+    font-family: var(--ts-font-mono);
     font-size: clamp(0.55rem, 2.2vw, 0.8rem);
-    letter-spacing: 0.3px;
+    letter-spacing: var(--ts-letter-spacing);
     white-space: nowrap;
     text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
     transition: opacity 0.4s ease-out;
