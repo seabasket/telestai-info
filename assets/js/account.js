@@ -44,13 +44,19 @@ window.TelestaiAccount = (function () {
   async function sendCode(email) {
     if (!(await init())) throw new Error('accounts not configured');
     const { error } = await supabase.auth.signInWithOtp({ email: email });
-    if (error) throw error;
+    if (error) {
+      console.error('TelestaiAccount: failed to send code', error);
+      throw error;
+    }
   }
 
   async function verifyCode(email, code) {
     if (!(await init())) throw new Error('accounts not configured');
     const { data, error } = await supabase.auth.verifyOtp({ email: email, token: code, type: 'email' });
-    if (error) throw error;
+    if (error) {
+      console.error('TelestaiAccount: failed to verify code', error);
+      throw error;
+    }
     return data.session;
   }
 
@@ -89,7 +95,10 @@ window.TelestaiAccount = (function () {
       .from('profiles')
       .update({ username: username })
       .eq('id', session.user.id);
-    if (error) throw error;
+    if (error) {
+      console.error('TelestaiAccount: failed to set username', error);
+      throw error;
+    }
   }
 
   async function setPhone(phone) {
@@ -100,7 +109,10 @@ window.TelestaiAccount = (function () {
       .from('profiles')
       .update({ phone: phone })
       .eq('id', session.user.id);
-    if (error) throw error;
+    if (error) {
+      console.error('TelestaiAccount: failed to set phone', error);
+      throw error;
+    }
   }
 
   // Fire-and-forget from check()'s success path -- failures are logged, not
