@@ -1,0 +1,13 @@
+# Supabase project config for the account system (see CLAUDE.md's
+# "Accounts (Supabase)" section, assets/js/account.js, and index.html).
+#
+# Fill in after creating a free project at supabase.com -- Project Settings
+# -> API gives you both values. The anon key is *meant* to be public/
+# client-side: access control comes from Postgres Row Level Security (see
+# supabase/schema.sql), not from keeping this key secret. Never put the
+# separate "service role" key here or anywhere in this repo.
+#
+# Left blank, the account system quietly stays inert (no sign-in UI, no
+# console errors) -- everything else on the site works exactly as before.
+url: ""
+anon_key: ""

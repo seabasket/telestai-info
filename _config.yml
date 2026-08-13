@@ -13,6 +13,7 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - vendor
+  - supabase
 
 # No permalink overrides: every page is a root-level file in -> root-level
 # file out, which is what index.html's `location.href = code + ".html"`

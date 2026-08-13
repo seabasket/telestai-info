@@ -43,12 +43,17 @@ _includes/
   essays/ai.md                 # markdown source for the /ai/ essay page (edit this to write the essay)
 _data/
   access_codes.yml            # SINGLE SOURCE OF TRUTH for valid access codes (slug/file/title/sha256)
+  supabase.yml                 # Supabase project url/anon_key for the account system (blank = disabled)
 assets/
   css/event.css                # shared styles for audio-synced event pages
   css/essay.css                 # shared styles for essay pages (sidebar TOC, footnotes, prose)
+  css/tokens.css                # design tokens (--ts-* colors/fonts) all other CSS/pages reference
   js/event-engine.js           # shared JS engine (stars/typewriter/gradient/pulse/audio wiring)
   js/essay-nav.js               # shared JS engine for essay pages (TOC build, scrollspy, progress bar)
+  js/account.js                 # TelestaiAccount: Supabase-backed email-OTP accounts (index.html only)
   audio/, img/                 # page media
+supabase/
+  schema.sql                   # one-time SQL setup for the accounts backend (see "Accounts (Supabase)")
 index.html                   # terminal landing page + access-code checker
 about.html, ts-*.html        # access-code content pages (root-level, one per code)
 ai.html                       # essay/writing access-code page (layout: essay)
@@ -178,6 +183,70 @@ Client-side state used by the gate:
   counter at the bottom of the terminal box.
 - `sessionStorage` key `phraseIndex` — resumes the terminal's typewriter
   animation position across in-site navigation.
+
+## Accounts (Supabase)
+
+Real, email-verified accounts sit alongside (not instead of) the
+cookie-based access-code history above: an account syncs which codes
+you've unlocked across devices/browsers, and replaces the terminal
+prompt's device/browser/IP text with a chosen username. This is the one
+place in the codebase that talks to a backend — everything else stays a
+static Jekyll build.
+
+**Backend**: [Supabase](https://supabase.com) (hosted Postgres + Auth). No
+Supabase MCP/CLI tooling is available in this repo's dev environment, so
+the project itself is created and configured by hand:
+1. Create a free Supabase project. Project Settings → API gives you the
+   **Project URL** and **anon public** key (safe to put in client-side
+   code — the anon key's access is enforced by Postgres Row Level
+   Security, not by secrecy; never use the separate "service role" key
+   here). Put both in `_data/supabase.yml`.
+2. Authentication → Providers → Email: enabled, OTP method set to a
+   6-digit code (not a magic link) — matches the terminal's typed-code UI.
+3. Run `supabase/schema.sql` once in the Supabase SQL Editor. It creates
+   `public.profiles` (`username`, `phone`, one row per account, RLS-scoped
+   to its owner) and `public.unlocked_codes` (insert-only ledger of which
+   `slug`s an account has unlocked, RLS-scoped to its owner) plus a trigger
+   that creates the profile row on signup. See the file's own comments for
+   why there's deliberately no public-read policy on `profiles` (Postgres
+   RLS is row-level, not column-level, so "let anyone read the username"
+   would actually mean "let anyone read the phone number too").
+
+`_data/supabase.yml` ships with both values blank. Left blank,
+`assets/js/account.js`'s `TelestaiAccount.init()` resolves `false` and
+every other method becomes a no-op — `index.html`'s account UI never
+renders, the prompt/corner-dropdown behave exactly as they do with no
+accounts at all. This is the default for a fresh clone/fork; the account
+system is opt-in infrastructure, not a hard dependency of the site.
+
+**Frontend** (`index.html` only — no other page has account UI):
+- `window.TelestaiAccount` (`assets/js/account.js`) is the only thing that
+  talks to Supabase: `sendCode`/`verifyCode` (email OTP), `getSession`/
+  `getProfile`, `setUsername`/`setPhone`, `syncUnlockedCode`/
+  `fetchUnlockedCodes`. It lazy-loads the Supabase JS client from
+  `esm.sh` via dynamic `import()` so it stays a plain `<script src>` like
+  `event-engine.js`/`essay-nav.js` — no bundler.
+- One shared account panel lives in `#account-section` (built by
+  `renderAccountPanel()` and friends in `index.html`'s own script), sitting
+  above the existing accessed-codes list inside the same `#history-list`
+  corner dropdown. Three separate triggers open the same panel: the corner
+  toggle (relabeled `sign in ▾` / `{username} ▾`), typing `signin`/`login`
+  into the terminal input (intercepted at the top of `check()`), or
+  clicking the `.prompt` tag itself (a `<button>`, `type="button"` so it
+  can't accidentally submit the terminal's form).
+- On a successful code entry, `check()` still writes to the
+  `correctHistory` cookie exactly as before (so logged-out visitors are
+  completely unaffected), and additionally fire-and-forgets
+  `TelestaiAccount.syncUnlockedCode(slug)` when signed in. On page load,
+  a signed-in session's `unlocked_codes` are merged into `correctHistory`
+  (and the cookie re-saved), so `renderHistoryUI()` needs no changes of
+  its own to show the merged result.
+
+**Deliberately not built yet** (separate, explicitly scoped future work):
+phone-number login (real phone OTP requires registering with an SMS
+carrier gateway like Twilio and costs money per message, unlike email OTP
+which is free), outbound SMS code delivery, and event sign-up/RSVP (no
+mechanism for that exists on event pages at all yet).
 
 ## Conventions
 
