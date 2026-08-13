@@ -1,0 +1,44 @@
+---
+layout: default
+---
+{%- comment -%}
+  Long-form essay/writing page template, modeled on Dario Amodei's
+  "Machines of Loving Grace" essay site: a numbered sidebar table of
+  contents (auto-built from this essay's <h2> headings, scroll-highlighted
+  as you read -- see assets/js/essay-nav.js) next to serif-set prose, plus
+  a thin reading-progress bar and kramdown's native footnote support.
+
+  A page using this layout should also set, in its own front matter:
+    stylesheets:  [/assets/css/essay.css]
+    head_scripts: [/assets/js/essay-nav.js]
+  and supply `title` (required), plus optionally `subtitle`, `byline`
+  (defaults to "telestai"), and `date` (freeform string).
+
+  The essay body itself should be markdown, kept in its own file under
+  _includes/essays/ and pulled in via the capture+include+markdownify
+  pattern -- see ai.html for a working example, or urgent-message.md /
+  index.html for the same pattern used elsewhere in this repo.
+{%- endcomment -%}
+<div class="essay-progress"></div>
+<article class="essay-page">
+  <header class="essay-header">
+    <h1>{{ page.title }}</h1>
+    {%- if page.subtitle %}
+    <p class="essay-subtitle">{{ page.subtitle }}</p>
+    {%- endif %}
+    <p class="essay-byline">{{ page.byline | default: "telestai" }}{% if page.date %} &middot; {{ page.date }}{% endif %}</p>
+  </header>
+
+  <div class="essay-body">
+    <nav class="essay-nav" aria-label="Table of contents"></nav>
+    <main class="essay-content">
+      {{ content }}
+    </main>
+  </div>
+
+  {% include home-button.html label="back" %}
+</article>
+
+<script>
+  TelestaiEssay.init();
+</script>

@@ -33,3 +33,7 @@
   file: ts-snst809.html
   title: "TS-SNST809"
   sha256: "638a685e9f9081798afbcb4645b21b6a02bc9cc7bd71de72566e4ab8b51d5d48"
+- slug: ai
+  file: ai.html
+  title: "AI"
+  sha256: "32e83e92d45d71f69dcf9d214688f0375542108631b45d344e5df2eb91c11566"

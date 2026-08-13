@@ -1,0 +1,15 @@
+---
+layout: essay
+permalink: /ai/
+title: "AI"
+subtitle: "notes and essays on artificial intelligence"
+byline: "srowe/telestai"
+date: "2026"
+overlay_transition: "800ms ease-out"
+stylesheets:
+  - /assets/css/essay.css
+head_scripts:
+  - /assets/js/essay-nav.js
+---
+{%- capture essay_markdown -%}{% include essays/ai.md %}{%- endcapture -%}
+{{ essay_markdown | markdownify }}

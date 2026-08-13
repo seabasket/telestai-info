@@ -35,18 +35,23 @@ CNAME                        # custom domain: telestai.info
 _config.yml                  # Jekyll site config (title, description, exclude list)
 _layouts/
   default.html                # shared page shell: <head>, page-overlay include, {{ content }}
+  essay.html                  # long-form essay page shell (nested inside default): sidebar TOC, progress bar
 _includes/
   page-overlay.html           # fade-from-black transition overlay (all pages)
   home-button.html            # "HOME" link back to index.html
   set-recording-button.html   # "SET RECORDING" link (event pages)
+  essays/ai.md                 # markdown source for the /ai/ essay page (edit this to write the essay)
 _data/
   access_codes.yml            # SINGLE SOURCE OF TRUTH for valid access codes (slug/file/title/sha256)
 assets/
   css/event.css                # shared styles for audio-synced event pages
+  css/essay.css                 # shared styles for essay pages (sidebar TOC, footnotes, prose)
   js/event-engine.js           # shared JS engine (stars/typewriter/gradient/pulse/audio wiring)
+  js/essay-nav.js               # shared JS engine for essay pages (TOC build, scrollspy, progress bar)
   audio/, img/                 # page media
 index.html                   # terminal landing page + access-code checker
 about.html, ts-*.html        # access-code content pages (root-level, one per code)
+ai.html                       # essay/writing access-code page (layout: essay)
 .github/workflows/
   jekyll-gh-pages.yml          # build + deploy to GitHub Pages on push to main
 ```
@@ -114,6 +119,23 @@ and the `npm start` live-reload helper.
    head_scripts:
      - /assets/js/event-engine.js
    ```
+   For a long-form essay/writing page (sidebar table of contents, reading-
+   progress bar, footnotes — modeled on Dario Amodei's "Machines of Loving
+   Grace"), copy `ai.html` as a starting point instead: `layout: essay`
+   plus
+   ```yaml
+   stylesheets:
+     - /assets/css/essay.css
+   head_scripts:
+     - /assets/js/essay-nav.js
+   ```
+   The essay's actual prose is markdown, kept separately in
+   `_includes/essays/<code>.md` and pulled into the page via
+   `{%- capture essay_markdown -%}{% include essays/<code>.md %}{%- endcapture -%}{{ essay_markdown | markdownify }}`
+   — edit that `.md` file to write the essay itself; `##` headings inside
+   it become the numbered sidebar entries, and kramdown's native
+   `word[^1]` / `[^1]: text` syntax gives footnotes for free. See
+   `_layouts/essay.html` for the full templating details.
 2. Compute the hash of the code's **suffix** — the part after the first
    `-` (or the whole slug if it has no dash), since the prefix is ignored
    at check time (see below):

@@ -10,11 +10,16 @@ GitHub Pages by `.github/workflows/jekyll-gh-pages.yml`.
 
 - `index.html` — the terminal landing page + access-code check
 - `about.html`, `ts-*.html` — access-code pages (each lives at the site root)
+- `ai.html` — essay/writing access-code page (`layout: essay`); prose lives in
+  `_includes/essays/ai.md`
 - `_layouts/default.html` — shared page shell (head, fade-in overlay)
+- `_layouts/essay.html` — long-form essay page shell (sidebar table of
+  contents, reading-progress bar, footnotes), nested inside `default.html`
 - `_includes/` — reusable bits: `page-overlay`, `home-button`, `set-recording-button`
 - `_data/access_codes.yml` — the list of access codes + their SHA-256 hashes
 - `assets/css/event.css`, `assets/js/event-engine.js` — shared styles/engine for the
   audio-synced event pages (ts-0001, ts-snri314, ts-snst809)
+- `assets/css/essay.css`, `assets/js/essay-nav.js` — shared styles/engine for essay pages
 - `assets/audio/`, `assets/img/` — page media
 
 ## adding a new access-code page
@@ -34,6 +39,9 @@ GitHub Pages by `.github/workflows/jekyll-gh-pages.yml`.
    head_scripts:
      - /assets/js/event-engine.js
    ```
+   For a long-form essay page, copy `ai.html` instead (`layout: essay`,
+   `/assets/css/essay.css` + `/assets/js/essay-nav.js`), and write the
+   actual essay as markdown in `_includes/essays/<code>.md`.
 2. Get the hash of the code's suffix — the part after the first `-` (or
    the whole code if it has no dash), since the prefix is disregarded when
    checking codes:
