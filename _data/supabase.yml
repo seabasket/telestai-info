@@ -9,5 +9,5 @@
 #
 # Left blank, the account system quietly stays inert (no sign-in UI, no
 # console errors) -- everything else on the site works exactly as before.
-url: ""
-anon_key: ""
+url: "https://zwwaopyxbcnxcmwwkurw.supabase.co"
+anon_key: "sb_publishable_460CAlbl_lOUGVdXjvEnCw_22CooqJI"
