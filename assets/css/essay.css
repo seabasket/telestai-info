@@ -194,7 +194,9 @@ body {
 }
 
 /* Footnotes -- kramdown renders [^1]/[^1]: text into this markup natively,
-   no plugin required. */
+   no plugin required. Hover (desktop) or tap (touch) on the superscript
+   reveals the note in a tooltip, matching Machines of Loving Grace; the
+   list at the bottom of the essay remains as a fallback. */
 .essay-content .footnotes {
   margin-top: 3.5rem;
   padding-top: 1.5rem;
@@ -207,10 +209,93 @@ body {
   padding-left: 1.25rem;
 }
 
-.essay-content sup a.footnote,
+.essay-content sup:has(> a.footnote) {
+  position: relative;
+}
+
+.essay-content a.footnote,
+.essay-content a.footnote-ref {
+  z-index: 1;
+  background-color: rgba(106, 185, 92, 0.2);
+  border-radius: 4px;
+  margin-left: 2px;
+  margin-right: 2px;
+  padding: 3px 4px 1px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  color: var(--ts-green);
+  position: relative;
+}
+
+.essay-content a.footnote:hover,
+.essay-content a.footnote:focus-visible,
+.essay-content sup.footnote-open > a.footnote {
+  background-color: rgba(106, 185, 92, 0.38);
+}
+
 .essay-content .footnotes a.reversefootnote {
   color: var(--ts-green);
   text-decoration: none;
+}
+
+.essay-content .footnote-tooltip {
+  z-index: 30;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: calc(100% + 0.5em);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(350px, calc(100vw - 1.5rem));
+  height: auto;
+  padding: 16px 20px;
+  background: #3a1a0c;
+  color: var(--ts-cream);
+  font-size: 0.95rem;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.5;
+  text-align: left;
+  letter-spacing: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(245, 230, 200, 0.16);
+  border-radius: 4px;
+  transition: opacity 0.12s ease, visibility 0.12s ease;
+}
+
+.essay-content .footnote-tooltip a {
+  color: var(--ts-green);
+}
+
+.essay-content .footnote-tooltip-num {
+  color: var(--ts-green);
+  font-weight: 500;
+  font-size: 0.75rem;
+  margin-right: 0.15em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .essay-content sup:has(> a.footnote):hover > .footnote-tooltip,
+  .essay-content sup:has(> a.footnote:focus-visible) > .footnote-tooltip {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.essay-content sup.footnote-open > .footnote-tooltip {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .essay-content .footnote-tooltip {
+    transition: none;
+  }
 }
 
 .essay-page .home-button {

@@ -19,7 +19,7 @@ GitHub Pages by `.github/workflows/jekyll-gh-pages.yml`.
 - `_data/access_codes.yml` — the list of access codes + their SHA-256 hashes
 - `assets/css/event.css`, `assets/js/event-engine.js` — shared styles/engine for the
   audio-synced event pages (ts-0001, ts-snri314, ts-snst809)
-- `assets/css/essay.css`, `assets/js/essay-nav.js` — shared styles/engine for essay pages
+- `assets/css/essay.css`, `assets/js/essay-nav.js` — shared styles/engine for essay pages (sidebar TOC, hover/tap footnote tooltips, progress bar)
 - `assets/css/tokens.css` — design tokens (colors/fonts) the rest of the CSS/pages reference
 - `assets/audio/`, `assets/img/` — page media
 - `assets/js/account.js`, `_data/supabase.yml`, `supabase/schema.sql` — the account system
