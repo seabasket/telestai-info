@@ -55,6 +55,7 @@ window.TelestaiEssay = (function () {
       return { heading, link };
     });
 
+    nav.innerHTML = '';
     nav.appendChild(list);
     return links;
   }
@@ -83,14 +84,20 @@ window.TelestaiEssay = (function () {
     if (!bar || !content) return;
 
     function update() {
-      const rect = content.getBoundingClientRect();
+      const liveBar = document.querySelector(barSelector);
+      const liveContent = document.querySelector(contentSelector);
+      if (!liveBar || !liveContent) return;
+      const rect = liveContent.getBoundingClientRect();
       const total = rect.height - window.innerHeight;
       const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 0));
-      bar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
+      liveBar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
     }
 
-    document.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
+    if (!watchProgress.bound) {
+      document.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      watchProgress.bound = true;
+    }
     update();
   }
 
@@ -199,17 +206,35 @@ window.TelestaiEssay = (function () {
       });
     });
 
-    document.addEventListener('click', function (event) {
-      if (!event.target.closest || !event.target.closest('sup:has(.footnote-tooltip)')) {
-        closeAll();
-      }
-    });
-    document.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape') closeAll();
-    });
-    window.addEventListener('resize', function () {
-      content.querySelectorAll('sup.footnote-open').forEach(placeTooltip);
-    });
+    if (!initFootnotes.docBound) {
+      document.addEventListener('click', function (event) {
+        const live = document.querySelector(contentSelector);
+        if (!live) return;
+        if (!event.target.closest || !event.target.closest('sup:has(.footnote-tooltip)')) {
+          live.querySelectorAll('sup.footnote-open').forEach((sup) => {
+            sup.classList.remove('footnote-open');
+            const a = sup.querySelector('a.footnote');
+            if (a) a.setAttribute('aria-expanded', 'false');
+          });
+        }
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key !== 'Escape') return;
+        const live = document.querySelector(contentSelector);
+        if (!live) return;
+        live.querySelectorAll('sup.footnote-open').forEach((sup) => {
+          sup.classList.remove('footnote-open');
+          const a = sup.querySelector('a.footnote');
+          if (a) a.setAttribute('aria-expanded', 'false');
+        });
+      });
+      window.addEventListener('resize', function () {
+        const live = document.querySelector(contentSelector);
+        if (!live) return;
+        live.querySelectorAll('sup.footnote-open').forEach(placeTooltip);
+      });
+      initFootnotes.docBound = true;
+    }
   }
 
   function init(options) {
