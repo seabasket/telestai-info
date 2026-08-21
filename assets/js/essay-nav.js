@@ -2,9 +2,10 @@
   Shared engine for long-form essay pages (layout: essay). Builds the
   sidebar table of contents from the essay's <h2> headings (kramdown
   already gives each one an id, so no slugify step is needed), highlights
-  the current section as the reader scrolls, and drives the reading-
-  progress bar. Defines window.TelestaiEssay; each essay page just calls
-  TelestaiEssay.init() after its content is on the page (see
+  the current section as the reader scrolls, drives the reading-progress
+  bar, and turns kramdown footnotes into hover/tap tooltips (Machines of
+  Loving Grace–style). Defines window.TelestaiEssay; each essay page just
+  calls TelestaiEssay.init() after its content is on the page (see
   _layouts/essay.html).
 
   Loaded in <head> (via the page's `head_scripts` front matter) so this
@@ -93,12 +94,131 @@ window.TelestaiEssay = (function () {
     update();
   }
 
+  // kramdown already emits <sup><a class="footnote" href="#fn:…">N</a></sup>
+  // plus a .footnotes list at the bottom. Clone each note into a tooltip
+  // sitting on the marker: hover on a fine pointer, tap on touch. The
+  // bottom list stays as a fallback (print, no-JS, "see all notes").
+  function initFootnotes(contentSelector) {
+    const content = document.querySelector(contentSelector);
+    if (!content) return;
+
+    const refs = Array.from(content.querySelectorAll('a.footnote'));
+    if (!refs.length) return;
+
+    function closeAll(except) {
+      content.querySelectorAll('sup.footnote-open').forEach((sup) => {
+        if (sup === except) return;
+        sup.classList.remove('footnote-open');
+        const a = sup.querySelector('a.footnote');
+        if (a) a.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    function placeTooltip(sup) {
+      const tooltip = sup.querySelector('.footnote-tooltip');
+      if (!tooltip) return;
+      tooltip.style.top = 'calc(100% + 0.5em)';
+      tooltip.style.bottom = 'auto';
+      tooltip.style.transform = 'translateX(-50%)';
+      const rect = tooltip.getBoundingClientRect();
+      const pad = 12;
+      let dx = 0;
+      if (rect.left < pad) dx = pad - rect.left;
+      else if (rect.right > window.innerWidth - pad) {
+        dx = window.innerWidth - pad - rect.right;
+      }
+      const marker = sup.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - marker.bottom;
+      if (rect.height + 12 > spaceBelow && marker.top > spaceBelow) {
+        tooltip.style.top = 'auto';
+        tooltip.style.bottom = 'calc(100% + 0.5em)';
+      }
+      tooltip.style.transform = dx
+        ? 'translateX(calc(-50% + ' + dx + 'px))'
+        : 'translateX(-50%)';
+    }
+
+    function isCoarsePointer(event) {
+      if (event && event.pointerType && event.pointerType !== 'mouse') return true;
+      return window.matchMedia('(hover: none)').matches;
+    }
+
+    refs.forEach((link, i) => {
+      const sup = link.closest('sup');
+      if (!sup || sup.querySelector('.footnote-tooltip')) return;
+
+      const href = link.getAttribute('href') || '';
+      const id = decodeURIComponent(href.replace(/^#/, ''));
+      const li = document.getElementById(id);
+      if (!li) return;
+
+      const clone = li.cloneNode(true);
+      clone.querySelectorAll('.reversefootnote').forEach((el) => el.remove());
+      const paragraphs = Array.from(clone.querySelectorAll('p'));
+      const html = paragraphs.length
+        ? paragraphs.map((p) => p.innerHTML.trim()).filter(Boolean).join('<br><br>')
+        : clone.innerHTML.trim();
+      if (!html) return;
+
+      const number = (link.textContent || '').trim() || String(i + 1);
+      const tooltipId = 'fn-tip-' + id.replace(/[^A-Za-z0-9:_-]/g, '');
+      const tooltip = document.createElement('span');
+      tooltip.className = 'footnote-tooltip';
+      tooltip.id = tooltipId;
+      tooltip.setAttribute('role', 'tooltip');
+      tooltip.innerHTML =
+        '<sup class="footnote-tooltip-num">' + number + '</sup> ' + html;
+
+      link.classList.add('footnote-ref');
+      link.setAttribute('aria-describedby', tooltipId);
+      link.setAttribute('aria-expanded', 'false');
+      sup.appendChild(tooltip);
+
+      function open() {
+        closeAll(sup);
+        sup.classList.add('footnote-open');
+        link.setAttribute('aria-expanded', 'true');
+        placeTooltip(sup);
+      }
+
+      link.addEventListener('click', function (event) {
+        // Touch / stylus: show the note in place instead of jumping to
+        // the bottom. Mouse click still follows the href (MoLG does too).
+        if (!isCoarsePointer(event)) return;
+        event.preventDefault();
+        if (sup.classList.contains('footnote-open')) closeAll();
+        else open();
+      });
+
+      link.addEventListener('mouseenter', function () {
+        if (!window.matchMedia('(hover: none)').matches) placeTooltip(sup);
+      });
+
+      link.addEventListener('focus', function () {
+        placeTooltip(sup);
+      });
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!event.target.closest || !event.target.closest('sup:has(.footnote-tooltip)')) {
+        closeAll();
+      }
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeAll();
+    });
+    window.addEventListener('resize', function () {
+      content.querySelectorAll('sup.footnote-open').forEach(placeTooltip);
+    });
+  }
+
   function init(options) {
     options = options || {};
     const contentSelector = options.content || '.essay-content';
     const links = buildNav(contentSelector, options.nav || '.essay-nav');
     watchScroll(links);
     watchProgress(options.progress || '.essay-progress', contentSelector);
+    initFootnotes(contentSelector);
   }
 
   return { init: init };

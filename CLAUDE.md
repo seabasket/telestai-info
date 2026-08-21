@@ -46,10 +46,10 @@ _data/
   supabase.yml                 # Supabase project url/anon_key for the account system (blank = disabled)
 assets/
   css/event.css                # shared styles for audio-synced event pages
-  css/essay.css                 # shared styles for essay pages (sidebar TOC, footnotes, prose)
+  css/essay.css                 # shared styles for essay pages (sidebar TOC, hover/tap footnotes, prose)
   css/tokens.css                # design tokens (--ts-* colors/fonts) all other CSS/pages reference
   js/event-engine.js           # shared JS engine (stars/typewriter/gradient/pulse/audio wiring)
-  js/essay-nav.js               # shared JS engine for essay pages (TOC build, scrollspy, progress bar)
+  js/essay-nav.js               # essay engine: TOC, scrollspy, progress bar, footnote tooltips
   js/account.js                 # TelestaiAccount: Supabase-backed email-OTP accounts (index.html only)
   audio/, img/                 # page media
 supabase/
@@ -139,7 +139,8 @@ and the `npm start` live-reload helper.
    `{%- capture essay_markdown -%}{% include essays/<code>.md %}{%- endcapture -%}{{ essay_markdown | markdownify }}`
    — edit that `.md` file to write the essay itself; `##` headings inside
    it become the numbered sidebar entries, and kramdown's native
-   `word[^1]` / `[^1]: text` syntax gives footnotes for free. See
+   `word[^1]` / `[^1]: text` syntax gives footnotes; essay-nav.js shows
+   those as hover/tap tooltips (the bottom-of-page list stays). See
    `_layouts/essay.html` for the full templating details.
 2. Compute the hash of the code's **suffix** — the part after the first
    `-` (or the whole slug if it has no dash), since the prefix is ignored
