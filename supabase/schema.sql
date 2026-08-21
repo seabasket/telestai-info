@@ -1,10 +1,12 @@
--- Schema for telestai.info's account system (email-OTP accounts + synced
--- unlocked-code history). Not part of the Jekyll build (excluded in
--- _config.yml) -- this is a one-time setup script.
+-- Schema for telestai.info's original email-OTP account tables.
+-- Not part of the Jekyll build (excluded in _config.yml).
 --
--- Run this once in the Supabase SQL Editor (Project -> SQL Editor -> paste
--- this whole file -> Run) after creating a fresh project. See CLAUDE.md's
--- "Accounts (Supabase)" section for the full setup walkthrough.
+-- Current sign-in is phone-number based -- run supabase/phone_auth.sql
+-- (additive) in the SQL Editor for that. This file remains the setup
+-- for the older email-OTP tables (profiles / unlocked_codes) if you
+-- still want those around; they are unused by the live UI.
+--
+-- Run once in the Supabase SQL Editor after creating a fresh project.
 
 -- One row per account, extending Supabase's built-in auth.users.
 -- phone is unverified -- captured for future SMS use, not usable for login

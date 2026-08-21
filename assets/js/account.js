@@ -1,28 +1,51 @@
 /*
-  Account system for index.html: email-OTP sign-in, a chosen username (shown
-  in place of the terminal prompt's device/browser/IP text), and syncing
-  which access codes an account has unlocked across devices. Defines
-  window.TelestaiAccount; see CLAUDE.md's "Accounts (Supabase)" section for
-  the full design and supabase/schema.sql for the backing tables.
+  Account system for index.html: phone-number sign-in (no email, no SMS
+  code) plus syncing which access codes an account has unlocked across
+  devices. Defines window.TelestaiAccount; see CLAUDE.md's "Accounts
+  (Supabase)" section and supabase/phone_auth.sql for the backing tables.
 
-  Backed by Supabase (https://supabase.com) -- config comes from
-  window.TELESTAI_SUPABASE, set inline in index.html from
-  _data/supabase.yml. Loaded in <head> like the other assets/js/*.js
-  engines, but everything here is async: call TelestaiAccount.init() once
-  and await it before using anything else.
+  The phone number *is* the credential -- 2FA/OTP is deliberately not
+  required. Knowing a number loads that number's unlocked-page list, the
+  same "unlisted, not private" model as the access codes themselves.
 
-  If _data/supabase.yml is left blank (the default for a fresh clone),
-  init() resolves to false and every other method becomes a safe no-op --
-  the rest of the site must keep working with zero account backend
-  configured.
+  Config comes from window.TELESTAI_SUPABASE (set in index.html from
+  _data/supabase.yml). If those values are blank, init() resolves false
+  and every other method is a safe no-op.
 */
 window.TelestaiAccount = (function () {
+  const STORAGE_KEY = 'telestai.account';
+  const LOCAL_DB_KEY = 'telestai.phoneDb';
   let supabase = null;
   let initPromise = null;
+  let cached = null;
+  let usedLocalFallback = false;
 
   function configured() {
     const cfg = window.TELESTAI_SUPABASE || {};
     return !!(cfg.url && cfg.anonKey);
+  }
+
+  function readCache() {
+    if (cached) return cached;
+    try {
+      cached = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    } catch (e) {
+      cached = null;
+    }
+    return cached;
+  }
+
+  function writeCache(account) {
+    cached = account;
+    if (account) localStorage.setItem(STORAGE_KEY, JSON.stringify(account));
+    else localStorage.removeItem(STORAGE_KEY);
+  }
+
+  function normalizePhone(raw) {
+    const digits = String(raw || '').replace(/\D/g, '');
+    const withCountry = digits.length === 10 ? '1' + digits : digits;
+    if (withCountry.length < 11 || withCountry.length > 15) return null;
+    return '+' + withCountry;
   }
 
   function init() {
@@ -41,115 +64,148 @@ window.TelestaiAccount = (function () {
     return initPromise;
   }
 
-  async function sendCode(email) {
-    if (!(await init())) throw new Error('accounts not configured');
-    const { error } = await supabase.auth.signInWithOtp({ email: email });
-    if (error) {
-      console.error('TelestaiAccount: failed to send code', error);
-      throw error;
+  function explain(error, fallback) {
+    const msg = (error && (error.message || error.code)) || '';
+    const lower = String(msg).toLowerCase();
+    if (error && error.code === 'PGRST202') {
+      return 'phone accounts not installed on the backend yet';
     }
+    if (lower.indexOf('invalid phone') !== -1) {
+      return "that doesn't look like a phone number";
+    }
+    if ((error && error.code === '23505') || lower.indexOf('username taken') !== -1) {
+      return 'that username is taken, try another';
+    }
+    console.error('TelestaiAccount:', error);
+    return fallback;
   }
 
-  async function verifyCode(email, code) {
-    if (!(await init())) throw new Error('accounts not configured');
-    const { data, error } = await supabase.auth.verifyOtp({ email: email, token: code, type: 'email' });
-    if (error) {
-      console.error('TelestaiAccount: failed to verify code', error);
-      throw error;
+  function localSession(phone, username, slugs) {
+    let db = {};
+    try { db = JSON.parse(localStorage.getItem(LOCAL_DB_KEY) || '{}'); } catch (e) { db = {}; }
+    if (!db[phone]) db[phone] = { username: null, slugs: [] };
+    if (username != null) db[phone].username = String(username).trim() || null;
+    if (slugs && slugs.length) {
+      slugs.forEach(function (s) {
+        if (s && db[phone].slugs.indexOf(s) === -1) db[phone].slugs.push(s);
+      });
     }
-    return data.session;
+    localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(db));
+    usedLocalFallback = true;
+    return { phone: phone, username: db[phone].username, slugs: db[phone].slugs };
+  }
+
+  async function callSession(phone, username, slugs) {
+    if (!(await init())) throw new Error('accounts not configured');
+    const payload = {
+      p_phone: phone,
+      p_username: username || null,
+      p_slugs: slugs && slugs.length ? slugs : null
+    };
+    const { data, error } = await supabase.rpc('phone_session', payload);
+    if (!error) {
+      usedLocalFallback = false;
+      return data;
+    }
+    // RPC not installed yet -- keep this-browser accounts working so sign-in
+    // isn't a brick wall, then prefer the real table once phone_auth.sql has
+    // been run.
+    if (error.code === 'PGRST202') {
+      console.warn('TelestaiAccount: phone_session missing, using this-browser store');
+      return localSession(phone, username, slugs);
+    }
+    throw new Error(explain(error, "couldn't reach accounts"));
+  }
+
+  async function signIn(phoneRaw) {
+    const phone = normalizePhone(phoneRaw);
+    if (!phone) throw new Error("that doesn't look like a phone number");
+    const data = await callSession(phone, null, null);
+    const account = {
+      phone: data.phone,
+      username: data.username || null,
+      slugs: data.slugs || []
+    };
+    writeCache({ phone: account.phone, username: account.username });
+    return account;
   }
 
   async function signOut() {
-    if (!(await init())) return;
-    await supabase.auth.signOut();
+    writeCache(null);
   }
 
   async function getSession() {
     if (!(await init())) return null;
-    const { data } = await supabase.auth.getSession();
-    return data.session;
+    return readCache();
   }
 
   async function getProfile() {
-    if (!(await init())) return null;
     const session = await getSession();
     if (!session) return null;
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('username, phone')
-      .eq('id', session.user.id)
-      .single();
-    if (error) {
-      console.error('TelestaiAccount: failed to load profile', error);
-      return null;
+    try {
+      const data = await callSession(session.phone, null, null);
+      const account = {
+        phone: data.phone,
+        username: data.username || null
+      };
+      writeCache(account);
+      return account;
+    } catch (e) {
+      console.error('TelestaiAccount: failed to load profile', e);
+      return session;
     }
-    return data;
   }
 
   async function setUsername(username) {
-    if (!(await init())) throw new Error('accounts not configured');
     const session = await getSession();
     if (!session) throw new Error('not signed in');
-    const { error } = await supabase
-      .from('profiles')
-      .update({ username: username })
-      .eq('id', session.user.id);
-    if (error) {
-      console.error('TelestaiAccount: failed to set username', error);
-      throw error;
-    }
+    const data = await callSession(session.phone, username, null);
+    writeCache({ phone: data.phone, username: data.username || null });
+    return data;
   }
 
-  async function setPhone(phone) {
-    if (!(await init())) throw new Error('accounts not configured');
-    const session = await getSession();
-    if (!session) throw new Error('not signed in');
-    const { error } = await supabase
-      .from('profiles')
-      .update({ phone: phone })
-      .eq('id', session.user.id);
-    if (error) {
-      console.error('TelestaiAccount: failed to set phone', error);
-      throw error;
-    }
-  }
-
-  // Fire-and-forget from check()'s success path -- failures are logged, not
-  // thrown, so a flaky network never blocks the (already-succeeded) local
-  // unlock experience.
   async function syncUnlockedCode(slug) {
-    if (!(await init())) return;
     const session = await getSession();
-    if (!session) return;
-    const { error } = await supabase
-      .from('unlocked_codes')
-      .upsert({ account_id: session.user.id, slug: slug }, { onConflict: 'account_id,slug', ignoreDuplicates: true });
-    if (error) console.error('TelestaiAccount: failed to sync unlocked code', error);
+    if (!session || !slug) return;
+    try {
+      const data = await callSession(session.phone, null, [slug]);
+      writeCache({ phone: data.phone, username: data.username || null });
+    } catch (e) {
+      console.error('TelestaiAccount: failed to sync unlocked code', e);
+    }
+  }
+
+  async function syncUnlockedCodes(slugs) {
+    const session = await getSession();
+    if (!session) return [];
+    const list = (slugs || []).filter(Boolean);
+    const data = await callSession(session.phone, null, list.length ? list : null);
+    writeCache({ phone: data.phone, username: data.username || null });
+    return data.slugs || [];
   }
 
   async function fetchUnlockedCodes() {
-    if (!(await init())) return [];
     const session = await getSession();
     if (!session) return [];
-    const { data, error } = await supabase.from('unlocked_codes').select('slug');
-    if (error) {
-      console.error('TelestaiAccount: failed to fetch unlocked codes', error);
+    try {
+      const data = await callSession(session.phone, null, null);
+      return data.slugs || [];
+    } catch (e) {
+      console.error('TelestaiAccount: failed to fetch unlocked codes', e);
       return [];
     }
-    return data.map(function (row) { return row.slug; });
   }
 
   return {
     init: init,
-    sendCode: sendCode,
-    verifyCode: verifyCode,
+    normalizePhone: normalizePhone,
+    signIn: signIn,
     signOut: signOut,
     getSession: getSession,
     getProfile: getProfile,
     setUsername: setUsername,
-    setPhone: setPhone,
     syncUnlockedCode: syncUnlockedCode,
+    syncUnlockedCodes: syncUnlockedCodes,
     fetchUnlockedCodes: fetchUnlockedCodes
   };
 })();

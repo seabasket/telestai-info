@@ -10,9 +10,10 @@ title: telestai.info
 <link rel="stylesheet" href="{{ '/assets/css/tokens.css' | relative_url }}">
 {%- comment -%}
   Account system config (see CLAUDE.md's "Accounts (Supabase)" section and
-  assets/js/account.js). Left blank in _data/supabase.yml, TELESTAI_SUPABASE
-  has empty strings and account.js quietly stays inert -- nothing below in
-  this page changes behavior until a real Supabase project is configured.
+  assets/js/account.js). Phone-number sign-in, no email/SMS. Left blank in
+  _data/supabase.yml, TELESTAI_SUPABASE has empty strings and account.js
+  quietly stays inert -- nothing below in this page changes behavior until
+  a real Supabase project is configured.
 {%- endcomment -%}
 <script>
   window.TELESTAI_SUPABASE = {
@@ -293,12 +294,11 @@ title: telestai.info
     background: rgba(245, 230, 200, 0.15);
   }
   /*
-    Account panel (sign in / username / phone), rendered by account.js's
-    initAccountUI() into #account-section, which sits above #history-codes
-    inside the same .history-list dropdown -- one shared panel, reachable
-    via the corner toggle, the "signin"/"login" terminal command, or
-    clicking the .prompt tag once signed in. Stays empty (no layout impact)
-    until TELESTAI_SUPABASE is actually configured.
+    Account panel (phone sign-in / username), rendered into #account-section,
+    which sits above #history-codes inside the same .history-list dropdown --
+    one shared panel, reachable via the corner toggle, the "signin"/"login"
+    terminal command, or clicking the .prompt tag. Stays empty (no layout
+    impact) until TELESTAI_SUPABASE is actually configured.
   */
   .account-block {
     padding: 6px 8px 10px;
@@ -599,8 +599,6 @@ renderHistoryUI();
 let accountConfigured = false;
 let accountSession = null;
 let accountProfile = null;
-let accountStep = "email"; // "email" | "code", signed-out flow only
-let pendingEmail = "";
 
 function el(tag, className, text) {
   const e = document.createElement(tag);
@@ -631,45 +629,24 @@ function updateToggleLabel() {
 
 function renderSignedOutPanel(section) {
   const wrap = el("div", "account-block");
+  wrap.appendChild(el("div", "account-label", "sign in with phone"));
+  const row = el("div", "account-row");
+  const phoneInput = el("input", "account-input");
+  phoneInput.type = "tel";
+  phoneInput.id = "account-phone";
+  phoneInput.placeholder = "(555) 555-0100";
+  phoneInput.autocomplete = "tel";
+  phoneInput.inputMode = "tel";
+  const enterBtn = el("button", "account-btn", "enter");
+  enterBtn.type = "button";
+  row.appendChild(phoneInput);
+  row.appendChild(enterBtn);
+  wrap.appendChild(row);
+  wrap.appendChild(el("div", "account-error"));
+  section.appendChild(wrap);
 
-  if (accountStep === "email") {
-    wrap.appendChild(el("div", "account-label", "sign in"));
-    const row = el("div", "account-row");
-    const emailInput = el("input", "account-input");
-    emailInput.type = "email";
-    emailInput.id = "account-email";
-    emailInput.placeholder = "you@email.com";
-    emailInput.autocomplete = "email";
-    const sendBtn = el("button", "account-btn", "send");
-    sendBtn.type = "button";
-    row.appendChild(emailInput);
-    row.appendChild(sendBtn);
-    wrap.appendChild(row);
-    wrap.appendChild(el("div", "account-error"));
-    section.appendChild(wrap);
-
-    sendBtn.onclick = handleSendCode;
-    emailInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleSendCode(); });
-  } else {
-    wrap.appendChild(el("div", "account-label", "code sent to " + pendingEmail));
-    const row = el("div", "account-row");
-    const codeInput = el("input", "account-input");
-    codeInput.type = "text";
-    codeInput.id = "account-code";
-    codeInput.placeholder = "123456";
-    codeInput.inputMode = "numeric";
-    codeInput.maxLength = 6;
-    const verifyBtn = el("button", "account-btn", "verify");
-    verifyBtn.type = "button";
-    row.appendChild(codeInput);
-    row.appendChild(verifyBtn);
-    wrap.appendChild(row);
-    wrap.appendChild(el("div", "account-error"));
-    section.appendChild(wrap);
-
-    verifyBtn.onclick = handleVerifyCode;
-    codeInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleVerifyCode(); });
-  }
+  enterBtn.onclick = handleSignIn;
+  phoneInput.addEventListener("keydown", (e) => { if (e.key === "Enter") handleSignIn(); });
 }
 
 function renderSignedInPanel(section) {
@@ -704,21 +681,11 @@ function renderSignedInPanel(section) {
   header.appendChild(signOutBtn);
   wrap.appendChild(header);
 
-  const phoneRow = el("div", "account-row");
-  const phoneInput = el("input", "account-input");
-  phoneInput.type = "tel";
-  phoneInput.id = "account-phone";
-  phoneInput.placeholder = "phone (optional, for future SMS)";
-  phoneInput.value = accountProfile.phone || "";
-  const phoneSaveBtn = el("button", "account-btn", "save");
-  phoneSaveBtn.type = "button";
-  phoneRow.appendChild(phoneInput);
-  phoneRow.appendChild(phoneSaveBtn);
-  wrap.appendChild(phoneRow);
+  if (accountProfile.phone) {
+    wrap.appendChild(el("div", "account-label", accountProfile.phone));
+  }
   wrap.appendChild(el("div", "account-error"));
   section.appendChild(wrap);
-
-  phoneSaveBtn.onclick = handleSetPhone;
 }
 
 function renderAccountPanel() {
@@ -737,8 +704,7 @@ function openAccountPanel() {
   document.getElementById("history-list").classList.add("open");
   renderAccountPanel();
   setTimeout(() => {
-    const focusTarget = document.getElementById("account-email")
-      || document.getElementById("account-code")
+    const focusTarget = document.getElementById("account-phone")
       || document.getElementById("account-username");
     if (focusTarget) focusTarget.focus();
   }, 0);
@@ -759,41 +725,45 @@ async function mergeAccountUnlockedCodes() {
   }
 }
 
-async function handleSendCode() {
-  const input = document.getElementById("account-email");
-  const email = input.value.trim();
-  if (!email) { setAccountError("enter an email first"); return; }
-  setAccountError("sending...");
+async function pushCookieHistory() {
+  if (!accountSession) return;
   try {
-    await TelestaiAccount.sendCode(email);
-    pendingEmail = email;
-    accountStep = "code";
-    renderAccountPanel();
-    const codeInput = document.getElementById("account-code");
-    if (codeInput) codeInput.focus();
+    const remote = await TelestaiAccount.syncUnlockedCodes(correctHistory);
+    let changed = false;
+    (remote || []).forEach((slug) => {
+      if (!correctHistory.includes(slug)) {
+        correctHistory.push(slug);
+        changed = true;
+      }
+    });
+    if (changed) {
+      setCookie("correctHistory", correctHistory);
+      renderHistoryUI();
+    }
   } catch (e) {
-    setAccountError("couldnt send that, try again");
+    console.error("failed to push cookie history", e);
   }
 }
 
-async function handleVerifyCode() {
-  const input = document.getElementById("account-code");
-  const code = input.value.trim();
-  if (!code) { setAccountError("enter the code"); return; }
-  setAccountError("checking...");
+async function handleSignIn() {
+  const input = document.getElementById("account-phone");
+  const phone = input.value.trim();
+  if (!phone) { setAccountError("enter a phone number"); return; }
+  setAccountError("signing in...");
   try {
-    accountSession = await TelestaiAccount.verifyCode(pendingEmail, code);
-    accountProfile = await TelestaiAccount.getProfile();
-    accountStep = "email";
-    promptLocked = true;
-    if (accountProfile && accountProfile.username) {
-      document.getElementById("prompt").textContent = accountProfile.username + " ~ %  ";
+    const account = await TelestaiAccount.signIn(phone);
+    accountSession = account;
+    accountProfile = { username: account.username, phone: account.phone };
+    promptLocked = !!account.username;
+    if (account.username) {
+      document.getElementById("prompt").textContent = account.username + " ~ %  ";
     }
     updateToggleLabel();
     renderAccountPanel();
+    await pushCookieHistory();
     await mergeAccountUnlockedCodes();
   } catch (e) {
-    setAccountError("wrong code, try again");
+    setAccountError((e && e.message) || "couldnt sign in");
   }
 }
 
@@ -805,25 +775,13 @@ async function handleSetUsername() {
   try {
     await TelestaiAccount.setUsername(username);
     accountProfile.username = username;
+    if (accountSession) accountSession.username = username;
     promptLocked = true;
     document.getElementById("prompt").textContent = username + " ~ %  ";
     updateToggleLabel();
     renderAccountPanel();
   } catch (e) {
     setAccountError("that username is taken, try another");
-  }
-}
-
-async function handleSetPhone() {
-  const input = document.getElementById("account-phone");
-  const phone = input.value.trim();
-  setAccountError("saving...");
-  try {
-    await TelestaiAccount.setPhone(phone);
-    accountProfile.phone = phone;
-    setAccountError("saved");
-  } catch (e) {
-    setAccountError("couldnt save that");
   }
 }
 
@@ -847,11 +805,12 @@ async function initAccountUI() {
 
   accountSession = await TelestaiAccount.getSession();
   if (accountSession) {
-    accountProfile = await TelestaiAccount.getProfile();
+    accountProfile = await TelestaiAccount.getProfile() || accountSession;
     if (accountProfile && accountProfile.username) {
       promptLocked = true;
       document.getElementById("prompt").textContent = accountProfile.username + " ~ %  ";
     }
+    await pushCookieHistory();
     await mergeAccountUnlockedCodes();
   }
   updateToggleLabel();

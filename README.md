@@ -22,9 +22,7 @@ GitHub Pages by `.github/workflows/jekyll-gh-pages.yml`.
 - `assets/css/essay.css`, `assets/js/essay-nav.js` — shared styles/engine for essay pages (sidebar TOC, hover/tap footnote tooltips, progress bar)
 - `assets/css/tokens.css` — design tokens (colors/fonts) the rest of the CSS/pages reference
 - `assets/audio/`, `assets/img/` — page media
-- `assets/js/account.js`, `_data/supabase.yml`, `supabase/schema.sql` — the account system
-  (email-OTP sign-in, synced unlocked-code history) on `index.html`; see CLAUDE.md's
-  "Accounts (Supabase)" section for setup. Left unconfigured by default, it's fully inert.
+- `assets/js/account.js`, `_data/supabase.yml`, `supabase/phone_auth.sql` — phone-number accounts (no email/SMS) + synced unlocked-code history on `index.html`; see CLAUDE.md's "Accounts (Supabase)" section. Left unconfigured by default, it's fully inert.
 
 ## adding a new access-code page
 
