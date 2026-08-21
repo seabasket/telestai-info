@@ -25,8 +25,8 @@ it -- with the real essay.
 ## A first section
 
 Start writing here. Headings at this level (`##`) become numbered
-entries in the sidebar to the left, and the thin bar at the very top of
-the page fills in as a reader scrolls through the essay.
+entries in the sidebar to the left, and the thin bar on the left edge of
+the page fills in top-to-bottom as a reader scrolls through the essay.
 
 Footnotes work too.[^example] Hover the number (or tap it, on a phone)
 and the note appears in place, the way it does in Dario Amodei's

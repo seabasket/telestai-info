@@ -78,6 +78,7 @@ window.TelestaiEssay = (function () {
 
   // Fills in .essay-progress based on how far through the content column
   // the reader has scrolled (0% at the top of the essay, 100% at the end).
+  // The bar itself is a vertical strip on the left edge of the viewport.
   function watchProgress(barSelector, contentSelector) {
     const bar = document.querySelector(barSelector);
     const content = document.querySelector(contentSelector);
@@ -90,7 +91,7 @@ window.TelestaiEssay = (function () {
       const rect = liveContent.getBoundingClientRect();
       const total = rect.height - window.innerHeight;
       const scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 0));
-      liveBar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
+      liveBar.style.height = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
     }
 
     if (!watchProgress.bound) {
